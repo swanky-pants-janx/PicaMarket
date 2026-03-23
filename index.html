@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MarketDesk</title>
+<title>MarketIndex</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;background:var(--color-background-tertiary,#f5f5f3);color:var(--color-text-primary,#1a1a1a);min-height:100vh}
@@ -148,10 +148,15 @@ select.form-input{font-size:14px}
 .dot.green{background:var(--green)}.dot.gray{background:var(--text3)}
 
 /* ── MODALS ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
-.modal{background:var(--bg);border-radius:16px 16px 0 0;padding:1.5rem;width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
-.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 1.25rem}
+.modal{background:var(--bg);border-radius:16px;padding:1.5rem;width:90%;max-width:580px;max-height:90vh;overflow-y:auto}
+.modal-handle{display:none}
+@media(max-width:767px){
+  .modal-overlay{align-items:flex-end}
+  .modal{border-radius:16px 16px 0 0;width:100%;max-width:100%}
+  .modal-handle{display:block;width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 1.25rem}
+}
 .modal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem}
 .modal-close{background:none;border:none;cursor:pointer;font-size:20px;color:var(--text2);padding:0 4px;line-height:1}
 
@@ -217,7 +222,7 @@ select.form-input{font-size:14px}
 <!-- AUTH -->
 <div id="auth-screen" class="auth-wrap">
   <div class="auth-card">
-    <div class="auth-logo">MarketDesk</div>
+    <div class="auth-logo">MarketIndex</div>
     <div class="auth-sub">Market runner dashboard</div>
     <div class="auth-tabs">
       <div class="auth-tab active" onclick="switchAuthTab('login')">Log in</div>
@@ -248,12 +253,12 @@ select.form-input{font-size:14px}
 
   <!-- TOP NAV -->
   <nav class="nav">
-    <span class="nav-brand" id="nav-brand">MarketDesk</span>
+    <span class="nav-brand" id="nav-brand">MarketIndex</span>
     <div class="nav-tabs">
       <div class="nav-tab active" onclick="showPage('approval')">Vendor Approval</div>
       <div class="nav-tab" onclick="showPage('approved')">Approved Vendors</div>
       <div class="nav-tab" onclick="showPage('markets')">Market Instances</div>
-      <div class="nav-tab public-tab" onclick="showPage('public')">Market Index (click me)</div>
+      <div class="nav-tab public-tab" onclick="showPage('public')">Market Index</div>
     </div>
     <div class="nav-right">
       <span class="nav-user" id="nav-user"></span>
@@ -301,8 +306,8 @@ select.form-input{font-size:14px}
     <div class="metric-grid">
       <div class="metric"><div class="metric-label">Pending</div><div class="metric-value amber" id="m-pending">0</div></div>
       <div class="metric"><div class="metric-label">Approved today</div><div class="metric-value green" id="m-today">0</div></div>
-      <div class="metric"><div class="metric-label">Total applications</div><div class="metric-value blue" id="m-total">0</div></div>
-      <div class="metric"><div class="metric-label">Markets active</div><div class="metric-value" id="m-markets">0</div></div>
+      <div class="metric"><div class="metric-label">Markets active</div><div class="metric-value blue" id="m-markets">0</div></div>
+      <div class="metric"><div class="metric-label">Total approved</div><div class="metric-value green" id="m-total">0</div></div>
     </div>
     <div class="card">
       <div class="toolbar">
@@ -479,7 +484,7 @@ select.form-input{font-size:14px}
 </div>
 
 <script>
-var accounts=[{email:'demo@marketdesk.co.za',password:'demo1234',name:'Demo User',market:'Demo Market'}];
+var accounts=[{email:'demo@marketindex.co.za',password:'demo1234',name:'Demo User',market:'Demo Market'}];
 var currentUser=null;
 
 function switchAuthTab(t){
@@ -574,7 +579,7 @@ function updateMetrics(){
   var rev=approved.reduce((s,v)=>s+(v.markets.length*(v.feePerMarket||FEE_PER_MARKET)),0);
   document.getElementById('m-pending').textContent=pending.length;
   document.getElementById('m-today').textContent=state.approvedToday;
-  document.getElementById('m-total').textContent=state.vendors.length;
+  document.getElementById('m-total').textContent=approved.length;
   document.getElementById('m-markets').textContent=state.markets.filter(m=>m.published).length;
   document.getElementById('m-app-total').textContent=approved.length;
   document.getElementById('m-app-paid').textContent=paid.length;
@@ -636,7 +641,7 @@ function toggleExpandMobile(id){state.expandedRows[id+'_m']=!state.expandedRows[
 function toggleAll(cb){document.querySelectorAll('.v-check').forEach(c=>c.checked=cb.checked);}
 
 function disapproveSelected(){
-  var checked=Array.from(document.querySelectorAll('.v-check:checked')).map(c=>c.value);
+  var checked=[...new Set(Array.from(document.querySelectorAll('.v-check:checked')).map(c=>c.value))];
   if(!checked.length){alert('Select at least one vendor to remove.');return;}
   state._removeQueue=checked;
   var names=checked.map(id=>{var v=state.vendors.find(x=>x.id===id);return v?v.name:null;}).filter(Boolean);
@@ -648,7 +653,7 @@ function confirmRemove(){
   state._removeQueue=[];closeModal('remove-modal');renderPending();updateMetrics();
 }
 function approveSelected(){
-  var checked=Array.from(document.querySelectorAll('.v-check:checked')).map(c=>c.value);
+  var checked=[...new Set(Array.from(document.querySelectorAll('.v-check:checked')).map(c=>c.value))];
   if(!checked.length){alert('Select at least one vendor to approve.');return;}
   state._approveQueue=checked.slice();openNextApproval();
 }
