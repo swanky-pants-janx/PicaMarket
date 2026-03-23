@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Market Index</title>
+<title>PicaMarket</title>
 <link rel="stylesheet" href="styles.css">
 <style>
   #loading{display:flex;align-items:center;justify-content:center;min-height:60vh;font-size:14px;color:var(--text2)}
@@ -28,7 +28,7 @@
 <div id="content">
   <div class="pub-nav">
     <div>
-      <div class="pub-nav-brand" id="pub-title">Market Index</div>
+      <div class="pub-nav-brand" id="pub-title">PicaMarket</div>
       <div class="pub-nav-sub">Vendor applications</div>
     </div>
   </div>
@@ -106,7 +106,7 @@ async function init() {
 
   document.getElementById('pub-title').textContent = profile.market_name;
   document.getElementById('pub-title-2').textContent = profile.market_name;
-  document.title = profile.market_name + ' — Market Index';
+  document.title = profile.market_name + ' — PicaMarket';
 
   document.getElementById('loading').style.display = 'none';
   document.getElementById('content').style.display = 'block';

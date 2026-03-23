@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MarketIndex</title>
+<title>PicaMarket</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <div id="auth-screen" class="auth-wrap">
   <div class="auth-card">
-    <div class="auth-logo">MarketIndex</div>
+    <div class="auth-logo">PicaMarket</div>
     <div class="auth-sub">Market runner dashboard</div>
     <div class="auth-tabs">
       <div class="auth-tab active" onclick="switchAuthTab('login')">Log in</div>
@@ -43,7 +43,7 @@
 
 <div id="dashboard" style="display:none">
   <nav class="nav">
-    <span class="nav-brand" id="nav-brand">MarketIndex</span>
+    <span class="nav-brand" id="nav-brand">PicaMarket</span>
     <div class="nav-tabs">
       <div class="nav-tab active" onclick="showPage('approval')">Vendor Approval</div>
       <div class="nav-tab" onclick="showPage('approved')">Approved Vendors</div>
@@ -133,7 +133,7 @@
   <div id="page-public" class="page" style="padding:0;max-width:100%">
     <div style="background:var(--bg2);min-height:calc(100vh - var(--nav-h))">
     <div class="public-page">
-      <div class="page-banner blue" style="margin-bottom:1rem"><div class="page-banner-icon">&#128065;</div><div><div class="page-banner-title">Market Index — Vendor-facing page</div><div class="page-banner-desc">This is what vendors will see. They can browse your published markets and submit an application. Vendors cannot see the rest of the dashboard.</div></div></div>
+      <div class="page-banner blue" style="margin-bottom:1rem"><div class="page-banner-icon">&#128065;</div><div><div class="page-banner-title">PicaMarket — Vendor-facing page</div><div class="page-banner-desc">This is what vendors will see. They can browse your published markets and submit an application. Vendors cannot see the rest of the dashboard.</div></div></div>
       <div class="public-banner"><div class="public-banner-text"><div style="font-size:20px;font-weight:500;color:var(--blue)" id="pub-title">Upcoming Markets</div><div style="font-size:13px;color:var(--text2);margin-top:4px">Browse and apply to attend as a vendor</div></div></div>
       <div class="tabs-inner">
         <div class="tab-inner active" onclick="pubTab('browse')">Browse markets</div>
@@ -162,7 +162,7 @@
   <button onclick="toggleDark()"><span>🌙 Dark mode</span><span class="sm-badge off" id="sm-dark-val">Off</span></button>
   <button onclick="toggleHints()"><span>💡 Hints</span><span class="sm-badge" id="sm-hints-val">Shown</span></button>
   <hr class="sm-sep">
-  <button onclick="goToMarketIndex()"><span>🌐 Market Index</span></button>
+  <button onclick="goToPicaMarket()"><span>🌐 PicaMarket</span></button>
 </div>
 
 <!-- DOT MENU -->
