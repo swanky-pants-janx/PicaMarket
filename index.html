@@ -32,6 +32,13 @@ body.dark{--bg:#1e1e1e;--bg2:#141414;--bg3:#2a2a2a;--border:rgba(255,255,255,0.1
 .nav-logout{font-size:12px;color:var(--red);cursor:pointer;padding:5px 10px;border:0.5px solid var(--red);border-radius:6px;background:none}
 .nav-logout:hover{background:var(--red-bg)}
 .dark-toggle{background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;cursor:pointer;padding:5px 10px;font-size:13px;color:var(--text2)}
+.settings-menu{display:none;position:fixed;z-index:300;background:var(--bg);border:0.5px solid var(--border);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.15);min-width:220px;padding:6px 0}
+.settings-menu .dm-label{padding:8px 14px 6px;font-size:11px;font-weight:500;color:var(--text3);border-bottom:0.5px solid var(--border);margin-bottom:4px}
+.settings-menu button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:9px 14px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--text);text-align:left;gap:16px}
+.settings-menu button:hover{background:var(--bg3)}
+.settings-menu .sm-sep{border:none;border-top:0.5px solid var(--border);margin:4px 0}
+.sm-badge{font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500;background:var(--green-bg);color:var(--green)}
+.sm-badge.off{background:var(--bg3);color:var(--text3)}
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--bottom-h);background:var(--bg);border-top:0.5px solid var(--border);z-index:100;align-items:stretch}
 .bottom-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--text3);font-size:10px;padding:6px 4px;border:none;background:none;-webkit-tap-highlight-color:transparent}
 .bottom-nav-item.active{color:var(--blue)}
@@ -231,23 +238,22 @@ select.form-input{font-size:14px}
       <div class="nav-tab active" onclick="showPage('approval')">Vendor Approval</div>
       <div class="nav-tab" onclick="showPage('approved')">Approved Vendors</div>
       <div class="nav-tab" onclick="showPage('markets')">Markets</div>
-      <div class="nav-tab public-tab" onclick="showPage('public')">Market Index <span style="font-size:11px;opacity:0.7;font-weight:400">(click me)</span></div>
     </div>
     <div class="nav-right">
       <span class="nav-user" id="nav-user"></span>
-      <button class="dark-toggle" id="dark-btn" onclick="toggleDark()">🌙 Dark</button>
+      <button class="dark-toggle" onclick="openSettingsMenu(event)">&#9776; Settings</button>
       <button class="nav-logout" onclick="doLogout()">Log out</button>
     </div>
     <div class="nav-mobile-right">
-      <button class="dark-toggle" id="dark-btn-m" onclick="toggleDark()">🌙</button>
-      <button class="nav-logout" onclick="doLogout()">Out</button>
+      <button class="dark-toggle" onclick="openSettingsMenu(event)">&#9776;</button>
+      <button class="nav-logout" onclick="doLogout()">Log Out</button>
     </div>
   </nav>
   <nav class="bottom-nav">
     <button class="bottom-nav-item active" onclick="showPage('approval')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Approval</span></button>
     <button class="bottom-nav-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Vendors</span></button>
     <button class="bottom-nav-item" onclick="showPage('markets')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Markets</span></button>
-    <button class="bottom-nav-item" onclick="showPage('public')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg><span>Index</span></button>
+    <button class="bottom-nav-item" onclick="openSettingsMenu(event)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Settings</span></button>
   </nav>
 
   <div id="page-approval" class="page active">
@@ -339,6 +345,15 @@ select.form-input{font-size:14px}
       </div>
     </div></div>
   </div>
+</div>
+
+<!-- SETTINGS MENU -->
+<div class="settings-menu" id="settings-menu">
+  <div class="dm-label">Settings</div>
+  <button onclick="toggleDark()"><span>🌙 Dark mode</span><span class="sm-badge off" id="sm-dark-val">Off</span></button>
+  <button onclick="toggleHints()"><span>💡 Hints</span><span class="sm-badge" id="sm-hints-val">Shown</span></button>
+  <hr class="sm-sep">
+  <button onclick="goToMarketIndex()"><span>🌐 Market Index</span></button>
 </div>
 
 <!-- DOT MENU -->
@@ -447,7 +462,11 @@ select.form-input{font-size:14px}
 <script>
 // ── HELPERS ──────────────────────────────────────────────────────
 var darkMode=false;
-function toggleDark(){darkMode=!darkMode;document.body.classList.toggle('dark',darkMode);document.getElementById('dark-btn').textContent=darkMode?'☀️ Light':'🌙 Dark';document.getElementById('dark-btn-m').textContent=darkMode?'☀️':'🌙';}
+function toggleDark(){darkMode=!darkMode;document.body.classList.toggle('dark',darkMode);syncSettingsMenu();}
+function openSettingsMenu(e){e.stopPropagation();var menu=document.getElementById('settings-menu');if(menu.style.display==='block'){menu.style.display='none';return;}syncSettingsMenu();menu.style.display='block';var rect=e.currentTarget.getBoundingClientRect();var top=rect.bottom+6,left=Math.max(8,rect.right-220);if(top+180>window.innerHeight)top=rect.top-190;menu.style.top=top+'px';menu.style.left=left+'px';}
+function syncSettingsMenu(){var dv=document.getElementById('sm-dark-val');if(dv){dv.textContent=darkMode?'On':'Off';dv.className=darkMode?'sm-badge':'sm-badge off';}var hv=document.getElementById('sm-hints-val');if(hv){hv.textContent=state.hideHints?'Hidden':'Shown';hv.className=state.hideHints?'sm-badge off':'sm-badge';}}
+function toggleHints(){state.hideHints=!state.hideHints;document.querySelectorAll('.page-banner').forEach(el=>el.style.display=state.hideHints?'none':'');syncSettingsMenu();}
+function goToMarketIndex(){document.getElementById('settings-menu').style.display='none';showPage('public');}
 function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
@@ -471,14 +490,14 @@ function doLogout(){currentUser=null;document.getElementById('dashboard').style.
 //   marketPayments:{'mid1':'outstanding','mid2':'paid'},
 //   payStatus:'outstanding'|'partial'|'paid', payMethod, feePerMarket,
 //   images, submitted, approvedAt }
-var state={vendors:[],markets:[],editMarketId:null,notesMarketId:null,approvedToday:0,expandedRows:{},filterPayment:'',_approveQueue:[],_removeQueue:[],_tempDates:[],_tempBanner:null,_menuVendorId:null,_payMarketId:null};
+var state={vendors:[],markets:[],editMarketId:null,notesMarketId:null,approvedToday:0,expandedRows:{},filterPayment:'',hideHints:false,_approveQueue:[],_removeQueue:[],_tempDates:[],_tempBanner:null,_menuVendorId:null,_payMarketId:null};
 var FEE=350;
 var _vendorImages=[];
 
 // ── NAVIGATION ────────────────────────────────────────────────────
-function showPage(p){document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.bottom-nav-item').forEach(el=>el.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');var map={approval:0,approved:1,markets:2,public:3};if(map[p]!==undefined){document.querySelectorAll('.nav-tab')[map[p]].classList.add('active');document.querySelectorAll('.bottom-nav-item')[map[p]].classList.add('active');}if(p==='approval')renderPending();if(p==='approved')renderApproved();if(p==='markets')renderMarkets();if(p==='public')renderPublic();updateMetrics();window.scrollTo(0,0);}
+function showPage(p){document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.bottom-nav-item').forEach(el=>el.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');var map={approval:0,approved:1,markets:2};if(map[p]!==undefined){document.querySelectorAll('.nav-tab')[map[p]].classList.add('active');document.querySelectorAll('.bottom-nav-item')[map[p]].classList.add('active');}if(p==='approval')renderPending();if(p==='approved')renderApproved();if(p==='markets')renderMarkets();if(p==='public')renderPublic();if(state.hideHints)document.querySelectorAll('.page-banner').forEach(el=>el.style.display='none');updateMetrics();window.scrollTo(0,0);}
 function pubTab(t){var tabs=document.querySelectorAll('.tabs-inner .tab-inner');tabs[0].classList.toggle('active',t==='browse');tabs[1].classList.toggle('active',t==='apply');document.getElementById('pub-browse').style.display=t==='browse'?'block':'none';document.getElementById('pub-apply').style.display=t==='apply'?'block':'none';if(t==='apply')renderVendorFormMarkets();}
-function updateMetrics(){var pend=state.vendors.filter(v=>v.status==='pending');var appr=state.vendors.filter(v=>v.status==='approved');var paid=appr.filter(v=>v.payStatus==='paid');var rev=appr.reduce((s,v)=>s+(v.markets.length*(v.feePerMarket||FEE)),0);document.getElementById('m-pending').textContent=pend.length;document.getElementById('m-app-total').textContent=appr.length;document.getElementById('m-app-paid').textContent=paid.length;document.getElementById('m-app-out').textContent=appr.length-paid.length;document.getElementById('m-app-rev').textContent='R'+rev.toLocaleString();}
+function updateMetrics(){var pend=state.vendors.filter(v=>v.status==='pending');var appr=state.vendors.filter(v=>v.status==='approved');var paid=appr.filter(v=>v.payStatus==='paid');var rev=appr.reduce((s,v)=>s+v.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+(m?m.fee||FEE:FEE);},0),0);document.getElementById('m-pending').textContent=pend.length;document.getElementById('m-app-total').textContent=appr.length;document.getElementById('m-app-paid').textContent=paid.length;document.getElementById('m-app-out').textContent=appr.length-paid.length;document.getElementById('m-app-rev').textContent='R'+rev.toLocaleString();}
 
 // ── VENDOR APPROVAL ───────────────────────────────────────────────
 function renderPending(filter){
@@ -492,14 +511,14 @@ function renderPending(filter){
     var exp=state.expandedRows[v.id];
     var photos=v.images&&v.images.length?'<div style="grid-column:1/-1"><div class="field-label">Stall photos</div><div class="img-thumb-grid" style="margin-top:4px">'+v.images.map(src=>'<div class="img-thumb"><img src="'+src+'"></div>').join('')+'</div></div>':'';
     var rows='<tr><td><input type="checkbox" class="v-check" value="'+v.id+'"></td><td><button class="vendor-name-btn" onclick="toggleExpand(\''+v.id+'\')">'+esc(v.name)+'</button></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">'+esc(v.desc)+'</td><td><span class="badge" style="background:var(--teal-bg);color:var(--teal)">'+v.markets.length+' mkt'+(v.markets.length!==1?'s':'')+'</span></td><td style="color:var(--text2)">'+v.submitted+'</td><td><span class="badge pending">Pending</span></td></tr>';
-    if(exp){rows+='<tr class="expand-row"><td colspan="6"><div class="expand-inner"><div><div class="field-label">Email</div><div class="field-value">'+esc(v.email)+'</div></div><div><div class="field-label">Est. fee</div><div class="field-value" style="font-weight:500">R'+(v.markets.length*FEE).toLocaleString()+'</div></div><div style="grid-column:1/-1"><div class="field-label">Description</div><div class="field-value">'+esc(v.desc)+'</div></div><div style="grid-column:1/-1"><div class="field-label">Markets selected</div><div class="market-chips" style="margin-top:4px">'+(mchips||'None')+'</div></div>'+photos+'</div></td></tr>';}
+    if(exp){rows+='<tr class="expand-row"><td colspan="6"><div class="expand-inner"><div><div class="field-label">Email</div><div class="field-value">'+esc(v.email)+'</div></div><div><div class="field-label">Est. fee</div><div class="field-value" style="font-weight:500">R'+(v.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+(m?m.fee||FEE:FEE);},0)).toLocaleString()+'</div></div><div style="grid-column:1/-1"><div class="field-label">Description</div><div class="field-value">'+esc(v.desc)+'</div></div><div style="grid-column:1/-1"><div class="field-label">Markets selected</div><div class="market-chips" style="margin-top:4px">'+(mchips||'None')+'</div></div>'+photos+'</div></td></tr>';}
     return rows;
   }).join('');
   cards.innerHTML=list.map(v=>{
     var mchips=v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);return m?'<span class="chip">'+esc(m.name)+'</span>':''}).join('');
     var exp=state.expandedRows[v.id+'_m'];
     var photos=v.images&&v.images.length?'<div><div class="field-label">Stall photos</div><div class="img-thumb-grid" style="margin-top:4px">'+v.images.map(src=>'<div class="img-thumb"><img src="'+src+'"></div>').join('')+'</div></div>':'';
-    var expand=exp?'<div class="vendor-card-expand"><div class="field-label">Email</div><div class="field-value">'+esc(v.email)+'</div><div class="field-label">Description</div><div class="field-value">'+esc(v.desc)+'</div><div class="field-label">Markets</div><div class="market-chips" style="margin-top:4px">'+(mchips||'None')+'</div><div class="field-label">Est. fee</div><div class="field-value" style="font-weight:500">R'+(v.markets.length*FEE).toLocaleString()+'</div>'+photos+'</div>':'';
+    var expand=exp?'<div class="vendor-card-expand"><div class="field-label">Email</div><div class="field-value">'+esc(v.email)+'</div><div class="field-label">Description</div><div class="field-value">'+esc(v.desc)+'</div><div class="field-label">Markets</div><div class="market-chips" style="margin-top:4px">'+(mchips||'None')+'</div><div class="field-label">Est. fee</div><div class="field-value" style="font-weight:500">R'+(v.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+(m?m.fee||FEE:FEE);},0)).toLocaleString()+'</div>'+photos+'</div>':'';
     return'<div class="vendor-card"><div class="vendor-card-header"><div class="vendor-card-check"><input type="checkbox" class="v-check" value="'+v.id+'"></div><div class="vendor-card-name" onclick="toggleExpandMobile(\''+v.id+'\')">'+esc(v.name)+'</div><div class="vendor-card-badge"><span class="badge pending">Pending</span></div></div><div class="vendor-card-meta">'+v.markets.length+' market'+(v.markets.length!==1?'s':'')+' &middot; '+v.submitted+'</div>'+expand+'</div>';
   }).join('');
 }
@@ -512,18 +531,14 @@ function approveSelected(){var checked=[...new Set(Array.from(document.querySele
 function closeApprovalModal(){state._approveQueue=[];closeModal('approve-modal');}
 function openNextApproval(){if(!state._approveQueue.length){updateMetrics();renderPending();return;}var id=state._approveQueue[0];var v=state.vendors.find(x=>x.id===id);if(!v){state._approveQueue.shift();openNextApproval();return;}document.getElementById('approve-modal-name').textContent=v.name;document.getElementById('approve-modal-count').textContent=state._approveQueue.length>1?state._approveQueue.length+' vendors in queue':'';document.getElementById('approve-market-checks').innerHTML=v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);if(!m)return'';return'<label style="display:flex;align-items:center;gap:10px;padding:12px;border:0.5px solid var(--border);border-radius:8px;cursor:pointer;margin-bottom:8px;background:var(--bg3)"><input type="checkbox" class="approve-mkt-cb" value="'+mid+'" checked style="width:18px;height:18px;accent-color:var(--blue)"><div><div style="font-size:14px;font-weight:500;color:var(--text)">'+esc(m.name)+'</div><div style="font-size:12px;color:var(--text2)">'+m.dates.join(' · ')+' · R'+(m.fee||FEE)+'/date</div></div></label>';}).join('');document.getElementById('approve-modal').classList.add('open');}
 
+function mergeApproveVendor(v,sel){var existing=state.vendors.find(x=>x.id!==v.id&&x.status==='approved'&&x.email===v.email);if(existing){sel.forEach(mid=>{if(!existing.markets.includes(mid))existing.markets.push(mid);if(!existing.marketPayments)existing.marketPayments={};if(!existing.marketPayments[mid])existing.marketPayments[mid]='outstanding';});state.vendors=state.vendors.filter(x=>x.id!==v.id);}else{v.status='approved';v.markets=sel.slice();v.payStatus='outstanding';v.payMethod=null;v.marketPayments={};sel.forEach(mid=>{v.marketPayments[mid]='outstanding';});v.approvedAt=new Date().toLocaleDateString('en-ZA');}}
+
 function confirmApproval(){
   var id=state._approveQueue.shift();
   var v=state.vendors.find(x=>x.id===id);
   var sel=Array.from(document.querySelectorAll('.approve-mkt-cb:checked')).map(c=>c.value);
   if(!sel.length){alert('Select at least one market.');state._approveQueue.unshift(id);return;}
-  v.status='approved';
-  v.markets=sel.slice();
-  v.payStatus='outstanding';
-  v.payMethod=null;
-  v.marketPayments={};
-  sel.forEach(mid=>{v.marketPayments[mid]='outstanding';});
-  v.approvedAt=new Date().toLocaleDateString('en-ZA');
+  mergeApproveVendor(v,sel);
   state.approvedToday++;
   closeModal('approve-modal');
   setTimeout(openNextApproval,200);
@@ -535,13 +550,7 @@ function approveAll(){
   [...state._approveQueue].forEach(id=>{
     var v=state.vendors.find(x=>x.id===id);
     if(!v)return;
-    v.status='approved';
-    v.markets=v.markets.slice();
-    v.payStatus='outstanding';
-    v.payMethod=null;
-    v.marketPayments={};
-    v.markets.forEach(mid=>{v.marketPayments[mid]='outstanding';});
-    v.approvedAt=new Date().toLocaleDateString('en-ZA');
+    mergeApproveVendor(v,v.markets.slice());
     state.approvedToday++;
   });
   state._approveQueue=[];
@@ -570,7 +579,7 @@ function renderApproved(filter,payFilter){
   if(!list.length){tb.innerHTML='';cards.innerHTML='';empty.style.display='block';updateMetrics();return;}
   empty.style.display='none';
   tb.innerHTML=list.map(v=>{
-    var fee=v.markets.length*(v.feePerMarket||FEE);
+    var fee=v.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+(m?m.fee||FEE:FEE);},0);
     var chips=v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);return m?'<span class="chip">'+esc(m.name)+'</span>':''}).join('');
     var ps=calcPayStatus(v);
     var pb=ps==='paid'?'<span class="badge paid">Paid</span>':ps==='partial'?'<span class="badge partial">Partial</span>':'<span class="badge outstanding">Outstanding</span>';
@@ -584,18 +593,18 @@ function renderApproved(filter,payFilter){
         var mm=(v.marketMethods||{})[mid];
         var mpb=mp==='paid'?'<span class="badge paid">Paid</span>':'<span class="badge outstanding">Outstanding</span>';
         var mmb=mm?'<span class="badge '+mm+'">'+mm.charAt(0).toUpperCase()+mm.slice(1)+'</span>':'<span style="color:var(--text3);font-size:12px">—</span>';
-        return'<tr style="background:var(--bg2)"><td colspan="2" style="padding:8px 12px 8px 28px;font-size:12px;color:var(--text2)">&#8627; '+(m?esc(m.name):mid)+'</td><td style="padding:8px 12px;font-size:12px;font-weight:500">R'+(v.feePerMarket||FEE)+'</td><td style="padding:8px 12px">'+mpb+'</td><td style="padding:8px 12px">'+mmb+'</td><td></td></tr>';
+        return'<tr style="background:var(--bg2)"><td colspan="2" style="padding:8px 12px 8px 28px;font-size:12px;color:var(--text2)">&#8627; '+(m?esc(m.name):mid)+'</td><td style="padding:8px 12px;font-size:12px;font-weight:500">R'+(m?m.fee||FEE:FEE)+'</td><td style="padding:8px 12px">'+mpb+'</td><td style="padding:8px 12px">'+mmb+'</td><td></td></tr>';
       }).join('');
     }
     return rows;
   }).join('');
   cards.innerHTML=list.map(v=>{
-    var fee=v.markets.length*(v.feePerMarket||FEE);
+    var fee=v.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+(m?m.fee||FEE:FEE);},0);
     var chips=v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);return m?'<span class="chip">'+esc(m.name)+'</span>':''}).join('');
     var ps=calcPayStatus(v);
     var pb=ps==='paid'?'<span class="badge paid">Paid</span>':ps==='partial'?'<span class="badge partial">Partial</span>':'<span class="badge outstanding">Outstanding</span>';
     var exp=state.expandedRows['appr_'+v.id];
-    var expandContent=exp?'<div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border)">'+v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);var mp=(v.marketPayments||{})[mid];var mm=(v.marketMethods||{})[mid];var mpb=mp==='paid'?'<span class="badge paid">Paid</span>':'<span class="badge outstanding">Outstanding</span>';var mmb=mm?'<span class="badge '+mm+'">'+mm.charAt(0).toUpperCase()+mm.slice(1)+'</span>':'';return'<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--border)"><span style="font-size:12px;color:var(--text2)">'+(m?esc(m.name):mid)+'</span><div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;font-weight:500;color:var(--text)">R'+(v.feePerMarket||FEE)+'</span>'+mpb+mmb+'</div></div>';}).join('')+'</div>':'';
+    var expandContent=exp?'<div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border)">'+v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);var mp=(v.marketPayments||{})[mid];var mm=(v.marketMethods||{})[mid];var mpb=mp==='paid'?'<span class="badge paid">Paid</span>':'<span class="badge outstanding">Outstanding</span>';var mmb=mm?'<span class="badge '+mm+'">'+mm.charAt(0).toUpperCase()+mm.slice(1)+'</span>':'';return'<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--border)"><span style="font-size:12px;color:var(--text2)">'+(m?esc(m.name):mid)+'</span><div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;font-weight:500;color:var(--text)">R'+(m?m.fee||FEE:FEE)+'</span>'+mpb+mmb+'</div></div>';}).join('')+'</div>':'';
     return'<div class="vendor-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div><button class="vendor-name-btn" onclick="toggleExpandApproved(\''+v.id+'\')" style="font-size:14px;font-weight:500">'+esc(v.name)+'</button><div style="font-size:11px;color:var(--text2)">'+esc(v.email)+'</div></div><div style="display:flex;align-items:center;gap:6px">'+pb+'<button onclick="openDotMenu(event,\''+v.id+'\')" style="background:none;border:0.5px solid var(--border);border-radius:6px;cursor:pointer;padding:4px 8px;font-size:16px;color:var(--text2);line-height:1">&#8942;</button></div></div><div class="market-chips" style="margin-bottom:8px">'+(chips||'—')+'</div><span style="font-size:13px;font-weight:500;color:var(--text)">R'+fee.toLocaleString()+'</span>'+expandContent+'</div>';
   }).join('');
   updateMetrics();
@@ -616,7 +625,7 @@ function openDotMenu(e,vid){
   if(top+180>window.innerHeight)top=rect.top-190;
   menu.style.top=top+'px';menu.style.left=left+'px';
 }
-document.addEventListener('click',function(e){var menu=document.getElementById('dot-menu');if(menu&&menu.style.display==='block'&&!menu.contains(e.target))menu.style.display='none';});
+document.addEventListener('click',function(e){var dm=document.getElementById('dot-menu');if(dm&&dm.style.display==='block'&&!dm.contains(e.target))dm.style.display='none';var sm=document.getElementById('settings-menu');if(sm&&sm.style.display==='block'&&!sm.contains(e.target))sm.style.display='none';});
 
 function dotMenuAction(action){
   document.getElementById('dot-menu').style.display='none';
@@ -694,7 +703,7 @@ function setPayment(method){
 }
 
 // ── ADD / CREDIT / REMOVE ─────────────────────────────────────────
-function onAddMarketChange(){var mid=document.getElementById('add-market-select').value;var info=document.getElementById('add-market-info');if(!mid){info.style.display='none';return;}var m=state.markets.find(x=>x.id===mid);var v=state.vendors.find(x=>x.id===state._menuVendorId);if(m&&v){var nf=v.feePerMarket||FEE;info.style.display='block';info.textContent='Vendor will be added to "'+m.name+'". Total fee updates to R'+((v.markets.length+1)*nf).toLocaleString()+' ('+(v.markets.length+1)+' markets × R'+nf+').';};}
+function onAddMarketChange(){var mid=document.getElementById('add-market-select').value;var info=document.getElementById('add-market-info');if(!mid){info.style.display='none';return;}var m=state.markets.find(x=>x.id===mid);var v=state.vendors.find(x=>x.id===state._menuVendorId);if(m&&v){var nf=m.fee||FEE;var existingTotal=v.markets.reduce((t,mid2)=>{var mx=state.markets.find(x=>x.id===mid2);return t+(mx?mx.fee||FEE:FEE);},0);info.style.display='block';info.textContent='Vendor will be added to "'+m.name+'" (R'+nf+'/stall). Total fee updates to R'+(existingTotal+nf).toLocaleString()+'.';};}
 function confirmAddMarket(){var mid=document.getElementById('add-market-select').value;if(!mid){alert('Please select a market.');return;}var v=state.vendors.find(x=>x.id===state._menuVendorId);if(!v)return;if(!v.markets.includes(mid)){v.markets.push(mid);if(!v.marketPayments)v.marketPayments={};v.marketPayments[mid]='outstanding';}closeModal('add-market-modal');renderApproved();updateMetrics();}
 function onCreditMarketChange(){var mid=document.getElementById('credit-market-select').value;var info=document.getElementById('credit-info');if(!mid){info.style.display='none';return;}var m=state.markets.find(x=>x.id===mid);var v=state.vendors.find(x=>x.id===state._menuVendorId);if(m&&v){info.style.display='block';info.textContent='Vendor will be moved to "'+m.name+'" and removed from all current markets. Payment status carries over.';};}
 function confirmCredit(){var mid=document.getElementById('credit-market-select').value;if(!mid){alert('Please select a market.');return;}var v=state.vendors.find(x=>x.id===state._menuVendorId);if(!v)return;v.markets=[mid];v.marketPayments={};v.marketPayments[mid]=v.payStatus==='paid'?'paid':'outstanding';closeModal('credit-modal');renderApproved();updateMetrics();}
@@ -717,7 +726,7 @@ function openMarketDashboard(mid){
   html+='<div class="card" style="margin-bottom:1rem"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:500;color:var(--text)">Payment status</span><span style="font-size:13px;color:var(--text2)">'+paidVendors.length+' paid / '+(approvedVendors.length-paidVendors.length)+' outstanding</span></div><div class="progress-wrap"><div class="progress-bar" style="width:'+(approvedVendors.length?Math.round((paidVendors.length/approvedVendors.length)*100):0)+'%"></div></div><div style="font-size:11px;color:var(--text3);margin-top:6px">R'+revPaid.toLocaleString()+' of R'+rev.toLocaleString()+' collected</div></div>';
   html+='<div class="card" style="margin-bottom:1rem"><h3 style="margin-bottom:1rem">Vendors attending</h3>';
   if(approvedVendors.length){
-    html+='<table class="vendor-table desktop-table"><thead><tr><th>Stall name</th><th>Email</th><th>Fee</th><th>Payment</th><th></th></tr></thead><tbody>'+approvedVendors.map(v=>{var mp=(v.marketPayments||{})[mid];var pb=mp==='paid'?'<span class="badge paid">Paid</span>':'<span class="badge outstanding">Outstanding</span>';return'<tr><td><strong>'+esc(v.name)+'</strong></td><td style="color:var(--text2)">'+esc(v.email)+'</td><td>R'+(v.feePerMarket||FEE)+'</td><td>'+pb+'</td><td><button onclick="removeFromMarket(\''+v.id+'\',\''+mid+'\')" style="background:none;border:0.5px solid var(--red);border-radius:6px;cursor:pointer;padding:4px 8px;font-size:12px;color:var(--red)">&#128465; Remove</button></td></tr>';}).join('')+'</tbody></table>'
+    html+='<table class="vendor-table desktop-table"><thead><tr><th>Stall name</th><th>Email</th><th>Fee</th><th>Payment</th><th></th></tr></thead><tbody>'+approvedVendors.map(v=>{var mp=(v.marketPayments||{})[mid];var pb=mp==='paid'?'<span class="badge paid">Paid</span>':'<span class="badge outstanding">Outstanding</span>';return'<tr><td><strong>'+esc(v.name)+'</strong></td><td style="color:var(--text2)">'+esc(v.email)+'</td><td>R'+fee+'</td><td>'+pb+'</td><td><button onclick="removeFromMarket(\''+v.id+'\',\''+mid+'\')" style="background:none;border:0.5px solid var(--red);border-radius:6px;cursor:pointer;padding:4px 8px;font-size:12px;color:var(--red)">&#128465; Remove</button></td></tr>';}).join('')+'</tbody></table>'
       +'<div class="mobile-cards">'+approvedVendors.map(v=>{var mp=(v.marketPayments||{})[mid];var pb=mp==='paid'?'<span class="badge paid">Paid</span>':'<span class="badge outstanding">Outstanding</span>';return'<div class="vendor-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><strong>'+esc(v.name)+'</strong>'+pb+'</div><div style="font-size:11px;color:var(--text2);margin-bottom:8px">'+esc(v.email)+'</div><button onclick="removeFromMarket(\''+v.id+'\',\''+mid+'\')" style="background:none;border:0.5px solid var(--red);border-radius:6px;cursor:pointer;padding:5px 10px;font-size:12px;color:var(--red)">&#128465; Remove</button></div>';}).join('')+'</div>';
   }else{html+='<div class="empty-state" style="padding:1.5rem">No vendors approved yet.</div>';}
   html+='</div>';
@@ -737,7 +746,7 @@ function openMarketDashboard(mid){
   window.scrollTo(0,0);
 }
 function removeFromMarket(vid,mid){var v=state.vendors.find(x=>x.id===vid);if(!v)return;v.markets=v.markets.filter(x=>x!==mid);if(v.marketPayments)delete v.marketPayments[mid];if(!v.markets.length)state.vendors=state.vendors.filter(x=>x.id!==vid);openMarketDashboard(mid);}
-function quickApprove(vid,mid){var v=state.vendors.find(x=>x.id===vid);if(!v)return;if(!v.markets.includes(mid))v.markets.push(mid);v.status='approved';v.payStatus='outstanding';v.payMethod=null;if(!v.marketPayments)v.marketPayments={};v.marketPayments[mid]='outstanding';v.approvedAt=new Date().toLocaleDateString('en-ZA');state.approvedToday++;updateMetrics();openMarketDashboard(mid);}
+function quickApprove(vid,mid){var v=state.vendors.find(x=>x.id===vid);if(!v)return;var otherMarkets=v.markets.filter(x=>x!==mid);var existing=state.vendors.find(x=>x.id!==vid&&x.status==='approved'&&x.email===v.email);if(existing){if(!existing.markets.includes(mid))existing.markets.push(mid);if(!existing.marketPayments)existing.marketPayments={};existing.marketPayments[mid]='outstanding';if(otherMarkets.length>0){v.markets=otherMarkets;}else{state.vendors=state.vendors.filter(x=>x.id!==vid);}}else if(otherMarkets.length>0){state.vendors.push({id:uid(),name:v.name,desc:v.desc,email:v.email,markets:[mid],images:v.images,status:'approved',payStatus:'outstanding',payMethod:null,marketPayments:{[mid]:'outstanding'},submitted:v.submitted,approvedAt:new Date().toLocaleDateString('en-ZA'),feePerMarket:v.feePerMarket});v.markets=otherMarkets;}else{if(!v.markets.includes(mid))v.markets.push(mid);v.status='approved';v.payStatus='outstanding';v.payMethod=null;if(!v.marketPayments)v.marketPayments={};v.marketPayments[mid]='outstanding';v.approvedAt=new Date().toLocaleDateString('en-ZA');}state.approvedToday++;updateMetrics();openMarketDashboard(mid);}
 function openNotes(mid){state.notesMarketId=mid;var m=state.markets.find(x=>x.id===mid);document.getElementById('notes-input').value=m?(m.notes||''):'';document.getElementById('notes-modal').classList.add('open');}
 function saveNotes(){var m=state.markets.find(x=>x.id===state.notesMarketId);if(m)m.notes=document.getElementById('notes-input').value;closeModal('notes-modal');openMarketDashboard(state.notesMarketId);}
 
@@ -792,7 +801,7 @@ function submitVendorForm(){
   updateMetrics();
 }
 
-function exportCSV(type){var list=type==='pending'?state.vendors.filter(v=>v.status==='pending'):state.vendors.filter(v=>v.status==='approved');if(!list.length){alert('No vendors to export.');return;}var headers=type==='pending'?['Name','Email','Description','Markets','Submitted']:['Name','Email','Markets','Stall Fee (R)','Payment Status','Payment Method','Approved'];var rows=list.map(v=>{var mnames=v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);return m?m.name:'?';}).join('; ');var fee=v.markets.length*(v.feePerMarket||FEE);return type==='pending'?[v.name,v.email,v.desc,mnames,v.submitted]:[v.name,v.email,mnames,fee,v.payStatus||'outstanding',v.payMethod||'',v.approvedAt||''];});var csv=[headers,...rows].map(r=>r.map(c=>'"'+(c||'').toString().replace(/"/g,'""')+'"').join(',')).join('\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=type+'-vendors.csv';a.click();}
+function exportCSV(type){var list=type==='pending'?state.vendors.filter(v=>v.status==='pending'):state.vendors.filter(v=>v.status==='approved');if(!list.length){alert('No vendors to export.');return;}var headers=type==='pending'?['Name','Email','Description','Markets','Submitted']:['Name','Email','Markets','Stall Fee (R)','Payment Status','Payment Method','Approved'];var rows=list.map(v=>{var mnames=v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);return m?m.name:'?';}).join('; ');var fee=v.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+(m?m.fee||FEE:FEE);},0);return type==='pending'?[v.name,v.email,v.desc,mnames,v.submitted]:[v.name,v.email,mnames,fee,v.payStatus||'outstanding',v.payMethod||'',v.approvedAt||''];});var csv=[headers,...rows].map(r=>r.map(c=>'"'+(c||'').toString().replace(/"/g,'""')+'"').join(',')).join('\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=type+'-vendors.csv';a.click();}
 </script>
 </body>
 </html>
