@@ -1,3 +1,6 @@
+// Capture recovery state before Supabase clears the URL hash
+var _isRecovery = window.location.hash.includes('type=recovery');
+
 // ── SUPABASE ──────────────────────────────────────────────────────
 var _sb = window.supabase.createClient(
   'https://bjzckhanxudkyrpczqbs.supabase.co',
@@ -34,7 +37,7 @@ async function doResetPassword(){var pass=document.getElementById('reset-passwor
 // Restore session on page load only; handle password recovery redirect
 _sb.auth.onAuthStateChange(async(event,session)=>{
   if(event==='PASSWORD_RECOVERY'){document.getElementById('reset-password-modal').classList.add('open');return;}
-  if(event==='INITIAL_SESSION'&&session&&!currentUser){var{data:profile}=await _sb.from('profiles').select('*').eq('id',session.user.id).single();if(profile)loginAs(session.user,profile);}
+  if(event==='INITIAL_SESSION'&&session&&!currentUser&&!_isRecovery){var{data:profile}=await _sb.from('profiles').select('*').eq('id',session.user.id).single();if(profile)loginAs(session.user,profile);}
 });
 
 // ── DB HELPERS ────────────────────────────────────────────────────
