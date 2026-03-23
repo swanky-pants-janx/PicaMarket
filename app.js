@@ -28,10 +28,11 @@ async function loginAs(user,profile){currentUser={...user,market:profile.market_
 async function doLogout(){await _sb.auth.signOut();currentUser=null;document.getElementById('dashboard').style.display='none';document.getElementById('auth-screen').style.display='flex';document.getElementById('login-email').value='';document.getElementById('login-password').value='';clearAuthMsg();switchAuthTab('login');}
 async function doForgotPassword(){var email=document.getElementById('forgot-email').value.trim().toLowerCase();if(!email){showAuthError('Please enter your email.');return;}var{error}=await _sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/'});if(error){showAuthError(error.message);return;}showAuthSuccess('Reset link sent! Check your inbox.');}
 async function doResetPassword(){var pass=document.getElementById('reset-password-input').value;var confirm=document.getElementById('reset-password-confirm').value;var re=document.getElementById('reset-error'),rs=document.getElementById('reset-success');re.style.display='none';rs.style.display='none';if(!pass||!confirm){re.textContent='Please fill in both fields.';re.style.display='block';return;}if(pass.length<6){re.textContent='Password must be at least 6 characters.';re.style.display='block';return;}if(pass!==confirm){re.textContent='Passwords do not match.';re.style.display='block';return;}var{error}=await _sb.auth.updateUser({password:pass});if(error){re.textContent=error.message;re.style.display='block';return;}rs.textContent='Password updated! You can now log in.';rs.style.display='block';setTimeout(()=>{document.getElementById('reset-password-modal').classList.remove('open');},2000);}
-// Restore session on page load (skip if this is a password recovery redirect)
-_sb.auth.getSession().then(async({data:{session}})=>{if(window.location.hash.includes('type=recovery'))return;if(session){var{data:profile}=await _sb.from('profiles').select('*').eq('id',session.user.id).single();if(profile)loginAs(session.user,profile);}});
-// Handle password recovery redirect
-_sb.auth.onAuthStateChange((event)=>{if(event==='PASSWORD_RECOVERY'){document.getElementById('reset-password-modal').classList.add('open');}});
+// Unified session handler: restores session on page load + handles password recovery
+_sb.auth.onAuthStateChange(async(event,session)=>{
+  if(event==='PASSWORD_RECOVERY'){document.getElementById('reset-password-modal').classList.add('open');return;}
+  if(event==='SIGNED_IN'&&session&&!currentUser){var{data:profile}=await _sb.from('profiles').select('*').eq('id',session.user.id).single();if(profile)loginAs(session.user,profile);}
+});
 
 // ── DB HELPERS ────────────────────────────────────────────────────
 function dbToMarket(r){return{id:r.id,name:r.name,desc:r.description||'',header:r.header||'',fee:r.fee||FEE,capacity:r.capacity||30,dates:r.dates||[],banner:r.banner||null,published:r.published||false,notes:r.notes||''};}
