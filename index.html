@@ -340,8 +340,8 @@ select.form-input{font-size:14px}
     </div>
     <div class="card">
       <div class="toolbar">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;color:var(--text);flex-shrink:0"><input type="checkbox" id="check-all" onchange="toggleAll(this)"> Select all</label>
         <input class="search-input" type="text" placeholder="Search vendors..." oninput="renderPending(this.value)">
-        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;color:var(--text)"><input type="checkbox" id="check-all" onchange="toggleAll(this)"> Select all</label>
       </div>
       <table class="vendor-table desktop-table">
         <thead><tr>
@@ -399,6 +399,7 @@ select.form-input{font-size:14px}
       <h2 style="margin:0">Market Instances</h2>
       <button class="btn primary" onclick="openMarketModal(null)">+ New market</button>
     </div>
+    <div id="public-link-banner" class="page-banner teal" style="margin-bottom:1.25rem"></div>
     <div id="markets-list"></div>
     <div id="markets-empty" class="empty-state" style="display:none">No market instances yet. Create one to get started.</div>
   </div>
@@ -467,11 +468,17 @@ select.form-input{font-size:14px}
     <div class="modal-handle"></div>
     <div class="modal-header">
       <div><h3>Approve: <span id="approve-modal-name"></span></h3><div style="font-size:12px;color:var(--text2);margin-top:2px" id="approve-modal-count"></div></div>
-      <button class="modal-close" onclick="skipApproval()">&#x2715;</button>
+      <button class="modal-close" onclick="closeApprovalModal()">&#x2715;</button>
     </div>
     <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Select which markets to approve this vendor for.</p>
     <div id="approve-market-checks"></div>
-    <div style="display:flex;gap:8px;margin-top:1rem"><button class="btn" style="flex:1" onclick="skipApproval()">Skip</button><button class="btn primary" style="flex:1;padding:12px" onclick="confirmApproval()">Approve</button></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:1rem">
+      <div style="display:flex;gap:8px">
+        <button class="btn" style="flex:1" onclick="skipApproval()">Skip</button>
+        <button class="btn primary" style="flex:1;padding:12px" onclick="confirmApproval()">Approve</button>
+      </div>
+      <button class="btn success" style="width:100%;padding:12px" id="approve-all-btn" onclick="approveAll()">Approve all</button>
+    </div>
   </div>
 </div>
 
@@ -557,20 +564,56 @@ function doRegister(){
   if(pass.length<6){showAuthError('Password must be at least 6 characters.');return;}
   if(pass!==confirm){showAuthError('Passwords do not match.');return;}
   if(accounts.find(a=>a.email===email)){showAuthError('An account with this email already exists.');return;}
-  var acc={email,password:pass,name,market};
+  var acc={email,password:pass,name,market,slug:makeSlug(market)};
   accounts.push(acc);
   showAuthSuccess('Account created! Logging you in...');
   setTimeout(()=>loginAs(acc),800);
 }
+function makeSlug(name){
+  return name.toLowerCase()
+    .replace(/&/g,'and')
+    .replace(/[^a-z0-9\s-]/g,'')
+    .trim()
+    .replace(/\s+/g,'-')
+    .replace(/-+/g,'-');
+}
+
 function loginAs(acc){
   currentUser=acc;
+  if(!acc.slug) acc.slug=makeSlug(acc.market);
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('dashboard').style.display='block';
   document.getElementById('nav-brand').innerHTML='<span>'+esc(acc.market)+'</span> &ndash; Dashboard';
   document.getElementById('nav-user').textContent=acc.name;
   document.getElementById('pub-title').textContent=acc.market;
+  renderPublicLinkBanner();
   renderPending();updateMetrics();
 }
+function renderPublicLinkBanner(){
+  var slug = currentUser ? currentUser.slug : '';
+  var fakeUrl = 'marketindex.co.za/markets/' + slug;
+  document.getElementById('public-link-banner').innerHTML =
+    '<div style="display:flex;align-items:flex-start;gap:10px">'
+    +'<div style="font-size:16px;flex-shrink:0;margin-top:1px">&#128279;</div>'
+    +'<div style="flex:1;min-width:0">'
+    +'<div style="font-size:13px;font-weight:500;color:var(--teal);margin-bottom:3px">Your public vendor page (not live yet)</div>'
+    +'<div style="font-size:12px;color:var(--teal-text);margin-bottom:10px;line-height:1.5">Once the app is deployed with a backend, this will be the link vendors use to find your markets and apply. Share it on social media, WhatsApp, or printed flyers. It is unique to your market and only shows your published markets.</div>'
+    +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+    +'<div style="background:var(--bg);border:0.5px solid var(--teal);border-radius:8px;padding:8px 12px;font-size:13px;font-family:monospace;color:var(--teal);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+fakeUrl+'</div>'
+    +'<button class="btn small" style="border-color:var(--teal);color:var(--teal);flex-shrink:0" onclick="copySlugLink(\''+fakeUrl+'\')">Copy link</button>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--text3);margin-top:8px">&#9432; Requires: Supabase database + Vercel deployment + backend routing to go live.</div>'
+    +'</div></div>';
+}
+
+function copySlugLink(url){
+  navigator.clipboard.writeText('https://'+url).then(function(){
+    alert('Link copied to clipboard!\n\nhttps://'+url+'\n\n(This URL is not live yet — it will work once the app is deployed.)');
+  }).catch(function(){
+    alert('Your public link will be:\nhttps://'+url+'\n\n(This URL is not live yet.)');
+  });
+}
+
 function doLogout(){
   currentUser=null;
   document.getElementById('dashboard').style.display='none';
@@ -717,6 +760,28 @@ function confirmApproval(){
   v.approvedAt=new Date().toLocaleDateString('en-ZA');state.approvedToday++;
   closeModal('approve-modal');setTimeout(openNextApproval,200);
 }
+function closeApprovalModal(){
+  state._approveQueue=[];
+  closeModal('approve-modal');
+}
+
+function approveAll(){
+  var remaining=[...state._approveQueue];
+  remaining.forEach(id=>{
+    var v=state.vendors.find(x=>x.id===id);
+    if(!v) return;
+    v.status='approved';
+    v.payStatus='outstanding';
+    v.payMethod=null;
+    v.approvedAt=new Date().toLocaleDateString('en-ZA');
+    state.approvedToday++;
+  });
+  state._approveQueue=[];
+  closeModal('approve-modal');
+  updateMetrics();
+  renderPending();
+}
+
 function skipApproval(){state._approveQueue.shift();closeModal('approve-modal');setTimeout(openNextApproval,200);}
 
 function renderApproved(filter,payFilter){
