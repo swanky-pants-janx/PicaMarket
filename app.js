@@ -5,7 +5,7 @@ var _sb = window.supabase.createClient(
 );
 
 // ── EMAIL ─────────────────────────────────────────────────────────
-function sendEmail(to,subject,html){_sb.functions.invoke('resend-email',{body:{to,subject,html}}).then(({error})=>{if(error)console.error('Email error:',error);});}
+function sendEmail(to,subject,html){fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/resend-email',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_f64M7MFa88zOMuZ083v-lw_Ypgcyhx-'},body:JSON.stringify({to,subject,html})}).catch(err=>console.error('Email error:',err));}
 
 // ── HELPERS ──────────────────────────────────────────────────────
 var darkMode=false;
