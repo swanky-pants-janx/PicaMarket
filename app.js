@@ -12,7 +12,7 @@ function syncSettingsMenu(){var dv=document.getElementById('sm-dark-val');if(dv)
 function toggleHints(){state.hideHints=!state.hideHints;document.querySelectorAll('.page-banner').forEach(el=>el.style.display=state.hideHints?'none':'');syncSettingsMenu();}
 function goToMarketIndex(){document.getElementById('settings-menu').style.display='none';showPage('public');}
 function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function uid(){return crypto.randomUUID();}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function makeSlug(n){return n.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-');}
 
