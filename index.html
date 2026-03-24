@@ -275,6 +275,13 @@
   <div class="form-group"><label class="form-label">Merchant ID</label><input class="form-input" id="pf-merchant-id" type="text" placeholder="e.g. 10011914"><div style="font-size:11px;color:var(--text3);margin-top:4px">Found in your PayFast dashboard under Settings → Merchant Details</div></div>
   <div class="form-group"><label class="form-label">Merchant Key</label><input class="form-input" id="pf-merchant-key" type="text" placeholder="e.g. q1cd2rdny4a53"><div style="font-size:11px;color:var(--text3);margin-top:4px">Found next to your Merchant ID in PayFast</div></div>
   <div class="info-box blue" style="margin-bottom:1rem;font-size:12px">&#9432; Money goes directly into your PayFast account. PicaMarket takes no commission.</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:0.5px solid var(--border);border-radius:8px;margin-bottom:1rem">
+    <div><div style="font-size:13px;font-weight:500;color:var(--text)">Sandbox mode</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Use PayFast test environment (no real money)</div></div>
+    <input type="checkbox" id="pf-sandbox" style="width:18px;height:18px;accent-color:var(--blue)" onchange="onSandboxToggle()">
+  </div>
+  <div id="pf-sandbox-creds" style="display:none;padding:10px;background:var(--bg3);border-radius:8px;margin-bottom:1rem;font-size:12px;color:var(--text2)">
+    Sandbox credentials pre-filled. Use card <strong>4000000000000002</strong>, any future expiry, any CVV to test.
+  </div>
   <div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="closeModal('payment-settings-modal')">Cancel</button><button class="btn primary" style="flex:1;padding:12px" id="pf-save-btn" onclick="savePaymentSettings()">Save</button></div>
 </div></div>
 

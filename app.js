@@ -14,33 +14,49 @@ function sendEmail(to,subject,html){fetch('https://bjzckhanxudkyrpczqbs.supabase
 var PF_FIELD_ORDER=['merchant_id','merchant_key','return_url','cancel_url','notify_url','name_first','name_last','email_address','cell_number','m_payment_id','amount','item_name','item_description','custom_str1','custom_str2','custom_str3','custom_str4','custom_str5','email_confirmation','confirmation_address','currency','payment_method'];
 function pfEncode(s){return encodeURIComponent(String(s).trim()).replace(/%20/g,'+');}
 function pfSignature(data){var parts=PF_FIELD_ORDER.filter(k=>data[k]!==undefined&&data[k]!==null&&data[k]!=='').map(k=>k+'='+pfEncode(data[k]));return md5(parts.join('&'));}
+var _pfSandbox=localStorage.getItem('pf_sandbox')==='1';
 function pfUrl(vendor,market){
   var mid=currentUser.payfastMerchantId,mkey=currentUser.payfastMerchantKey;
   if(!mid||!mkey)return null;
+  var host=_pfSandbox?'sandbox.payfast.co.za':'www.payfast.co.za';
   var nameParts=vendor.name.split(' ');
   var data={merchant_id:mid,merchant_key:mkey,return_url:'https://picamarket.site/',cancel_url:'https://picamarket.site/',notify_url:'https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/payfast-itn',name_first:nameParts[0],name_last:nameParts.slice(1).join(' ')||'-',email_address:vendor.email,m_payment_id:vendor.id+':'+market.id,amount:(market.fee||FEE).toFixed(2),item_name:(market.name+' stall fee').substring(0,100)};
   data.signature=pfSignature(data);
   var q=new URLSearchParams();
   PF_FIELD_ORDER.forEach(k=>{if(data[k]!==undefined&&data[k]!==null&&data[k]!=='')q.set(k,data[k]);});
   q.set('signature',data.signature);
-  return'https://www.payfast.co.za/eng/process?'+q.toString();
+  return'https://'+host+'/eng/process?'+q.toString();
+}
+function onSandboxToggle(){
+  var on=document.getElementById('pf-sandbox').checked;
+  document.getElementById('pf-sandbox-creds').style.display=on?'block':'none';
+  if(on){document.getElementById('pf-merchant-id').value='10000100';document.getElementById('pf-merchant-key').value='46f0cd694581a';}
+  else{document.getElementById('pf-merchant-id').value=currentUser.payfastMerchantId||'';document.getElementById('pf-merchant-key').value=currentUser.payfastMerchantKey||'';}
 }
 async function openPaymentSettings(){
-  document.getElementById('pf-merchant-id').value=currentUser.payfastMerchantId||'';
-  document.getElementById('pf-merchant-key').value=currentUser.payfastMerchantKey||'';
+  var sandbox=_pfSandbox;
+  document.getElementById('pf-sandbox').checked=sandbox;
+  document.getElementById('pf-sandbox-creds').style.display=sandbox?'block':'none';
+  document.getElementById('pf-merchant-id').value=sandbox?'10000100':(currentUser.payfastMerchantId||'');
+  document.getElementById('pf-merchant-key').value=sandbox?'46f0cd694581a':(currentUser.payfastMerchantKey||'');
   document.getElementById('payment-settings-modal').classList.add('open');
   document.getElementById('settings-menu').style.display='none';
 }
 async function savePaymentSettings(){
-  var mid=document.getElementById('pf-merchant-id').value.trim();
-  var mkey=document.getElementById('pf-merchant-key').value.trim();
+  var sandbox=document.getElementById('pf-sandbox').checked;
+  var mid=sandbox?currentUser.payfastMerchantId:(document.getElementById('pf-merchant-id').value.trim());
+  var mkey=sandbox?currentUser.payfastMerchantKey:(document.getElementById('pf-merchant-key').value.trim());
   var btn=document.getElementById('pf-save-btn');
-  btn.textContent='Saving...';btn.disabled=true;
-  var{error}=await _sb.from('profiles').update({payfast_merchant_id:mid,payfast_merchant_key:mkey}).eq('id',currentUser.id);
-  btn.textContent='Save';btn.disabled=false;
-  if(error){alert('Failed to save. Try again.');return;}
-  currentUser.payfastMerchantId=mid||null;
-  currentUser.payfastMerchantKey=mkey||null;
+  if(!sandbox){
+    btn.textContent='Saving...';btn.disabled=true;
+    var{error}=await _sb.from('profiles').update({payfast_merchant_id:mid,payfast_merchant_key:mkey}).eq('id',currentUser.id);
+    btn.textContent='Save';btn.disabled=false;
+    if(error){alert('Failed to save. Try again.');return;}
+    currentUser.payfastMerchantId=mid||null;
+    currentUser.payfastMerchantKey=mkey||null;
+  }
+  _pfSandbox=sandbox;
+  localStorage.setItem('pf_sandbox',sandbox?'1':'0');
   closeModal('payment-settings-modal');
 }
 
