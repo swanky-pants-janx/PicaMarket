@@ -220,9 +220,6 @@ select.form-input{font-size:14px}
   .page{padding:1rem;padding-bottom:calc(1rem + var(--bottom-h))}
   .desktop-table{display:none}
   .mobile-cards{display:block}
-  .page-actions{flex-direction:column;gap:8px}
-  .page-actions .btn-row{width:100%}
-  .page-actions .btn-row .btn{flex:1}
   .card{padding:1rem}
   .market-footer .btn-row{width:100%}
   .market-footer .btn-row .btn{flex:1}
@@ -231,7 +228,6 @@ select.form-input{font-size:14px}
   .nav-mobile-right{display:none}
   .desktop-table{display:table}
   .mobile-cards{display:none}
-  .page-actions{flex-wrap:nowrap}
   .expand-inner{grid-template-columns:1fr 1fr}
 }
 @media(min-width:768px) and (max-width:1023px){
