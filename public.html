@@ -148,7 +148,7 @@ function renderVendorFormMarkets() {
     if (hasOptions) {
       stallOptions = '<div class="stall-type-group" onclick="event.stopPropagation()" style="margin-top:10px;display:flex;flex-direction:column;gap:6px">'
         + types.map(function(t, i) {
-            return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="radio" name="st-'+m.id+'" value="'+esc(t.id)+'"'+(i===0?' checked':'')+' style="accent-color:var(--blue)"><span style="width:10px;height:10px;border-radius:50%;background:'+(t.color||'#6b7280')+';display:inline-block;flex-shrink:0"></span> '+esc(t.name)+' — R'+t.fee+'/date</label>';
+            return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="radio" name="st-'+m.id+'" value="'+esc(t.id)+'"'+(i===0?' checked':'')+' style="accent-color:var(--blue)"> '+esc(t.name)+' — R'+t.fee+'/date</label>';
           }).join('')
         + '</div>';
     }
