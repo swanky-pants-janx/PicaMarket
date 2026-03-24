@@ -115,7 +115,7 @@
         <input class="search-input" type="text" placeholder="Search vendors..." oninput="renderPending(this.value)">
         <button class="btn small" id="refresh-btn" onclick="refreshPending()" style="flex-shrink:0">&#8635; Refresh</button>
       </div>
-      <table class="vendor-table desktop-table"><thead><tr><th style="width:36px"></th><th>Stall name</th><th>Description</th><th>Markets</th><th>Submitted</th><th>Status</th></tr></thead><tbody id="pending-tbody"></tbody></table>
+      <table class="vendor-table desktop-table"><thead id="pending-thead"><tr><th style="width:36px"></th><th>Stall name</th><th>Description</th><th>Markets</th><th>Est. fee</th><th>Submitted</th><th>Status</th></tr></thead><tbody id="pending-tbody"></tbody></table>
       <div class="mobile-cards" id="pending-cards"></div>
       <div id="pending-empty" class="empty-state" style="display:none">No pending applications</div>
     </div>
@@ -143,7 +143,7 @@
           <option value="">All statuses</option><option value="outstanding">Outstanding</option><option value="paid">Paid</option>
         </select>
       </div>
-      <table class="vendor-table desktop-table"><thead><tr><th>Stall name</th><th>Markets</th><th>Total fee</th><th>Payment</th><th>Method</th><th></th></tr></thead><tbody id="approved-tbody"></tbody></table>
+      <table class="vendor-table desktop-table"><thead id="approved-thead"><tr><th>Stall name</th><th>Markets</th><th>Total fee</th><th>Payment</th><th>Method</th><th></th></tr></thead><tbody id="approved-tbody"></tbody></table>
       <div class="mobile-cards" id="approved-cards"></div>
       <div id="approved-empty" class="empty-state" style="display:none">No approved vendors yet</div>
     </div>

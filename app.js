@@ -174,7 +174,7 @@ function sbDel(table,id){_sb.from(table).delete().eq('id',id).then(({error})=>{i
 //   marketPayments:{'mid1':'outstanding','mid2':'paid'},
 //   payStatus:'outstanding'|'partial'|'paid', payMethod,
 //   images, submitted, approvedAt }
-var state={vendors:[],markets:[],editMarketId:null,notesMarketId:null,expandedRows:{},filterPayment:'',hideHints:false,_approveQueue:[],_removeQueue:[],_tempDates:[],_tempBanner:null,_tempStallTypes:[],_menuVendorId:null,_payMarketId:null};
+var state={vendors:[],markets:[],editMarketId:null,notesMarketId:null,expandedRows:{},filterPayment:'',hideHints:false,pendingSort:{col:null,dir:1},approvedSort:{col:null,dir:1},_approveQueue:[],_removeQueue:[],_tempDates:[],_tempBanner:null,_tempStallTypes:[],_menuVendorId:null,_payMarketId:null};
 var FEE=350;
 var DEFAULT_FORM_FIELDS=[
   {id:'builtin-name',type:'text',label:'Stall / shop name',required:true,builtin:true},
@@ -195,15 +195,20 @@ function renderPending(filter){
   var blocked=currentUser?currentUser.blockedEmails||[]:[];
   var list=state.vendors.filter(v=>v.status==='pending'&&!blocked.includes(v.email.toLowerCase()));
   if(filter)list=list.filter(v=>v.name.toLowerCase().includes(filter.toLowerCase()));
+  var ps=state.pendingSort;
+  if(ps.col){list.sort((a,b)=>{var av,bv;if(ps.col==='name'){av=a.name.toLowerCase();bv=b.name.toLowerCase();}else if(ps.col==='desc'){av=(a.desc||'').toLowerCase();bv=(b.desc||'').toLowerCase();}else if(ps.col==='markets'){av=a.markets.length;bv=b.markets.length;}else if(ps.col==='fee'){av=a.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+getStallFee(a,m);},0);bv=b.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+getStallFee(b,m);},0);}else if(ps.col==='submitted'){av=a.submitted;bv=b.submitted;}return av<bv?-ps.dir:av>bv?ps.dir:0;});}
   var tb=document.getElementById('pending-tbody'),cards=document.getElementById('pending-cards'),empty=document.getElementById('pending-empty');
   if(!list.length){tb.innerHTML='';cards.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
+  var _psh=function(label,col){var arr=ps.col===col?(ps.dir===1?' ▲':' ▼'):'';return'<th style="cursor:pointer;user-select:none;white-space:nowrap" onclick="sortPending(\''+col+'\')">'+label+'<span style="font-size:10px;color:var(--text3)">'+arr+'</span></th>';};
+  document.getElementById('pending-thead').innerHTML='<tr><th style="width:36px"></th>'+_psh('Stall name','name')+_psh('Description','desc')+_psh('Markets','markets')+_psh('Est. fee','fee')+_psh('Submitted','submitted')+'<th>Status</th></tr>';
   tb.innerHTML=list.map(v=>{
     var mchips=v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);return m?'<span class="chip">'+esc(m.name)+'</span>':''}).join('');
+    var estFee=v.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+getStallFee(v,m);},0);
     var exp=state.expandedRows[v.id];
     var photos=v.images&&v.images.length?'<div style="grid-column:1/-1"><div class="field-label">Stall photos</div><div class="img-thumb-grid" style="margin-top:4px">'+v.images.map((src,i)=>'<div class="img-thumb clickable" onclick="openLightbox(\''+v.id+'\','+i+')"><img src="'+src+'"></div>').join('')+'</div></div>':'';
-    var rows='<tr><td><input type="checkbox" class="v-check" value="'+v.id+'"></td><td><button class="vendor-name-btn" onclick="toggleExpand(\''+v.id+'\')">'+esc(v.name)+'</button></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">'+esc(v.desc)+'</td><td><span class="badge" style="background:var(--teal-bg);color:var(--teal)">'+v.markets.length+' mkt'+(v.markets.length!==1?'s':'')+'</span></td><td style="color:var(--text2)">'+v.submitted+'</td><td><span class="badge pending">Pending</span></td></tr>';
-    if(exp){var stallInfo=v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);return m?'<div style="font-size:12px;padding:3px 0">'+esc(m.name)+' <span style="color:var(--text3)">('+stallTypeLabel(v,m)+')</span></div>':''}).join('');rows+='<tr class="expand-row"><td colspan="6"><div class="expand-inner"><div><div class="field-label">Email</div><div class="field-value">'+esc(v.email)+'</div></div><div><div class="field-label">Est. fee</div><div class="field-value" style="font-weight:500">R'+(v.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+getStallFee(v,m);},0)).toLocaleString()+'</div></div><div style="grid-column:1/-1"><div class="field-label">Description</div><div class="field-value">'+esc(v.desc)+'</div></div>'+_vendorCustomSection(v,true)+'<div style="grid-column:1/-1"><div class="field-label">Markets &amp; stall types</div><div style="margin-top:6px">'+stallInfo+'</div></div>'+photos+'</div></td></tr>';}
+    var rows='<tr><td><input type="checkbox" class="v-check" value="'+v.id+'"></td><td><button class="vendor-name-btn" onclick="toggleExpand(\''+v.id+'\')">'+esc(v.name)+'</button></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">'+esc(v.desc)+'</td><td><span class="badge" style="background:var(--teal-bg);color:var(--teal)">'+v.markets.length+' mkt'+(v.markets.length!==1?'s':'')+'</span></td><td style="font-weight:500">R'+estFee.toLocaleString()+'</td><td style="color:var(--text2)">'+v.submitted+'</td><td><span class="badge pending">Pending</span></td></tr>';
+    if(exp){var stallInfo=v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);return m?'<div style="font-size:12px;padding:3px 0">'+esc(m.name)+' <span style="color:var(--text3)">('+stallTypeLabel(v,m)+')</span></div>':''}).join('');rows+='<tr class="expand-row"><td colspan="7"><div class="expand-inner"><div><div class="field-label">Email</div><div class="field-value">'+esc(v.email)+'</div></div><div style="grid-column:1/-1"><div class="field-label">Description</div><div class="field-value">'+esc(v.desc)+'</div></div>'+_vendorCustomSection(v,true)+'<div style="grid-column:1/-1"><div class="field-label">Markets &amp; stall types</div><div style="margin-top:6px">'+stallInfo+'</div></div>'+photos+'</div></td></tr>';}
     return rows;
   }).join('');
   cards.innerHTML=list.map(v=>{
@@ -276,7 +281,11 @@ function renderApproved(filter,payFilter){
   var list=state.vendors.filter(v=>v.status==='approved');
   if(filter)list=list.filter(v=>v.name.toLowerCase().includes(filter.toLowerCase()));
   if(payFilter){list=list.filter(v=>{var ps=calcPayStatus(v);return payFilter==='paid'?ps==='paid':ps!=='paid';});}
+  var as=state.approvedSort;
+  if(as.col){list.sort((a,b)=>{var av,bv;if(as.col==='name'){av=a.name.toLowerCase();bv=b.name.toLowerCase();}else if(as.col==='markets'){av=a.markets.length;bv=b.markets.length;}else if(as.col==='fee'){av=a.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+getStallFee(a,m);},0);bv=b.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+getStallFee(b,m);},0);}else if(as.col==='payment'){var ord={paid:0,partial:1,outstanding:2};av=ord[calcPayStatus(a)]||0;bv=ord[calcPayStatus(b)]||0;}return av<bv?-as.dir:av>bv?as.dir:0;});}
   var tb=document.getElementById('approved-tbody'),cards=document.getElementById('approved-cards'),empty=document.getElementById('approved-empty');
+  var _ash=function(label,col){var arr=as.col===col?(as.dir===1?' ▲':' ▼'):'';return'<th style="cursor:pointer;user-select:none;white-space:nowrap" onclick="sortApproved(\''+col+'\')">'+label+'<span style="font-size:10px;color:var(--text3)">'+arr+'</span></th>';};
+  document.getElementById('approved-thead').innerHTML='<tr>'+_ash('Stall name','name')+_ash('Markets','markets')+_ash('Total fee','fee')+_ash('Payment','payment')+'<th>Method</th><th></th></tr>';
   if(!list.length){tb.innerHTML='';cards.innerHTML='';empty.style.display='block';updateMetrics();return;}
   empty.style.display='none';
   tb.innerHTML=list.map(v=>{
@@ -314,6 +323,8 @@ function renderApproved(filter,payFilter){
   updateMetrics();
 }
 function toggleExpandApproved(id){state.expandedRows['appr_'+id]=!state.expandedRows['appr_'+id];renderApproved();}
+function sortPending(col){if(state.pendingSort.col===col)state.pendingSort.dir*=-1;else{state.pendingSort.col=col;state.pendingSort.dir=1;}renderPending();}
+function sortApproved(col){if(state.approvedSort.col===col)state.approvedSort.dir*=-1;else{state.approvedSort.col=col;state.approvedSort.dir=1;}renderApproved();}
 
 // ── DOT MENU ──────────────────────────────────────────────────────
 function openDotMenu(e,vid){
