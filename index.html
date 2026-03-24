@@ -316,11 +316,25 @@
 
 <div class="modal-overlay" id="payment-settings-modal"><div class="modal"><div class="modal-handle"></div>
   <div class="modal-header"><h3>Payment settings</h3><button class="modal-close" onclick="closeModal('payment-settings-modal')">&#x2715;</button></div>
-  <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Enter your PayFast merchant credentials. When you approve a vendor, they'll receive a payment link in their email that pays directly into your PayFast account.</p>
+
+  <div class="mf-section-label" style="margin-top:0.25rem">PayFast</div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Vendors receive a PayFast payment link in their approval email. Money goes directly into your PayFast account.</p>
   <div class="form-group"><label class="form-label">Merchant ID</label><input class="form-input" id="pf-merchant-id" type="text" placeholder="e.g. 10011914"><div style="font-size:11px;color:var(--text3);margin-top:4px">Found in your PayFast dashboard under Settings → Merchant Details</div></div>
   <div class="form-group"><label class="form-label">Merchant Key</label><input class="form-input" id="pf-merchant-key" type="text" placeholder="e.g. q1cd2rdny4a53"><div style="font-size:11px;color:var(--text3);margin-top:4px">Found next to your Merchant ID in PayFast</div></div>
-  <div class="info-box blue" style="margin-bottom:1rem;font-size:12px">&#9432; Money goes directly into your PayFast account. PicaMarket takes no commission.</div>
-  <div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="closeModal('payment-settings-modal')">Cancel</button><button class="btn primary" style="flex:1;padding:12px" id="pf-save-btn" onclick="savePaymentSettings()">Save</button></div>
+
+  <div class="mf-section-label">EFT / Bank transfer</div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">If filled in, vendors will also see your banking details in payment reminder emails as an alternative to PayFast.</p>
+  <div class="form-group"><label class="form-label">Account holder</label><input class="form-input" id="bank-holder" type="text" placeholder="e.g. Jane Smith"></div>
+  <div class="form-group"><label class="form-label">Bank name</label><input class="form-input" id="bank-name" type="text" placeholder="e.g. FNB, Capitec, Nedbank"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="form-group"><label class="form-label">Account number</label><input class="form-input" id="bank-acc-num" type="text" placeholder="e.g. 62012345678"></div>
+    <div class="form-group"><label class="form-label">Branch code</label><input class="form-input" id="bank-branch" type="text" placeholder="e.g. 250655"></div>
+  </div>
+  <div class="form-group"><label class="form-label">Account type</label>
+    <select class="form-input" id="bank-acc-type"><option value="">Select...</option><option value="Cheque">Cheque / Current</option><option value="Savings">Savings</option></select>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-top:0.5rem"><button class="btn" style="flex:1" onclick="closeModal('payment-settings-modal')">Cancel</button><button class="btn primary" style="flex:1;padding:12px" id="pf-save-btn" onclick="savePaymentSettings()">Save</button></div>
 </div></div>
 
 <div class="modal-overlay" id="reset-password-modal"><div class="modal"><div class="modal-handle"></div>

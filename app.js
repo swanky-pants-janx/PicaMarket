@@ -28,19 +28,30 @@ function pfUrl(vendor,market){
 async function openPaymentSettings(){
   document.getElementById('pf-merchant-id').value=currentUser.payfastMerchantId||'';
   document.getElementById('pf-merchant-key').value=currentUser.payfastMerchantKey||'';
+  document.getElementById('bank-holder').value=currentUser.bankHolder||'';
+  document.getElementById('bank-name').value=currentUser.bankName||'';
+  document.getElementById('bank-acc-num').value=currentUser.bankAccNum||'';
+  document.getElementById('bank-branch').value=currentUser.bankBranch||'';
+  document.getElementById('bank-acc-type').value=currentUser.bankAccType||'';
   document.getElementById('payment-settings-modal').classList.add('open');
   document.getElementById('settings-menu').style.display='none';
 }
 async function savePaymentSettings(){
   var mid=document.getElementById('pf-merchant-id').value.trim();
   var mkey=document.getElementById('pf-merchant-key').value.trim();
+  var bankHolder=document.getElementById('bank-holder').value.trim();
+  var bankName=document.getElementById('bank-name').value.trim();
+  var bankAccNum=document.getElementById('bank-acc-num').value.trim();
+  var bankBranch=document.getElementById('bank-branch').value.trim();
+  var bankAccType=document.getElementById('bank-acc-type').value;
   var btn=document.getElementById('pf-save-btn');
   btn.textContent='Saving...';btn.disabled=true;
-  var{error}=await _sb.from('profiles').update({payfast_merchant_id:mid,payfast_merchant_key:mkey}).eq('id',currentUser.id);
+  var{error}=await _sb.from('profiles').update({payfast_merchant_id:mid,payfast_merchant_key:mkey,bank_holder:bankHolder,bank_name:bankName,bank_acc_num:bankAccNum,bank_branch:bankBranch,bank_acc_type:bankAccType}).eq('id',currentUser.id);
   btn.textContent='Save';btn.disabled=false;
   if(error){alert('Failed to save. Try again.');return;}
-  currentUser.payfastMerchantId=mid||null;
-  currentUser.payfastMerchantKey=mkey||null;
+  currentUser.payfastMerchantId=mid||null;currentUser.payfastMerchantKey=mkey||null;
+  currentUser.bankHolder=bankHolder||null;currentUser.bankName=bankName||null;
+  currentUser.bankAccNum=bankAccNum||null;currentUser.bankBranch=bankBranch||null;currentUser.bankAccType=bankAccType||null;
   closeModal('payment-settings-modal');
 }
 
@@ -69,7 +80,7 @@ function showAuthSuccess(m){var e=document.getElementById('auth-success');e.text
 function clearAuthMsg(){document.getElementById('auth-error').style.display='none';document.getElementById('auth-success').style.display='none';}
 async function doLogin(){var email=document.getElementById('login-email').value.trim().toLowerCase();var pass=document.getElementById('login-password').value;if(!email||!pass){showAuthError('Please fill in all fields.');return;}var{data,error}=await _sb.auth.signInWithPassword({email,password:pass});if(error){showAuthError('Incorrect email or password.');return;}var{data:profile}=await _sb.from('profiles').select('*').eq('id',data.user.id).single();if(!profile){showAuthError('Account has no profile. Please contact support.');return;}loginAs(data.user,profile);}
 async function doRegister(){var tsToken=window.turnstile?window.turnstile.getResponse(document.getElementById('reg-turnstile')):null;if(!tsToken){showAuthError('Please wait for the security check to complete.');return;}var verifyRes=await fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/verify-turnstile',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_f64M7MFa88zOMuZ083v-lw_Ypgcyhx-'},body:JSON.stringify({token:tsToken})});var verifyData=await verifyRes.json();if(!verifyData.success){showAuthError('Security check failed. Please refresh and try again.');if(window.turnstile)window.turnstile.reset(document.getElementById('reg-turnstile'));return;}var market=document.getElementById('reg-market').value.trim();var name=document.getElementById('reg-name').value.trim();var email=document.getElementById('reg-email').value.trim().toLowerCase();var pass=document.getElementById('reg-password').value;var confirm=document.getElementById('reg-confirm').value;if(!market||!name||!email||!pass||!confirm){showAuthError('Please fill in all fields.');return;}if(!email.includes('@')){showAuthError('Please enter a valid email.');return;}if(pass.length<6){showAuthError('Password must be at least 6 characters.');return;}if(pass!==confirm){showAuthError('Passwords do not match.');return;}var{data:existing}=await _sb.from('profiles').select('id').eq('market_name',market).maybeSingle();if(existing){showAuthError('That market name is already taken. Please choose a different name.');return;}var{data,error}=await _sb.auth.signUp({email,password:pass});if(error){showAuthError(error.message);return;}var slug=makeSlug(market);var{error:pErr}=await _sb.from('profiles').insert({id:data.user.id,market_name:market,coordinator_name:name,slug,coordinator_email:email});if(pErr){showAuthError('Account created but profile failed to save. Please try logging in.');return;}showAuthSuccess('Account created! Logging you in...');setTimeout(()=>loginAs(data.user,{market_name:market,coordinator_name:name,slug}),800);}
-async function loginAs(user,profile){currentUser={...user,market:profile.market_name,name:profile.coordinator_name,slug:profile.slug,payfastMerchantId:profile.payfast_merchant_id||null,payfastMerchantKey:profile.payfast_merchant_key||null};state.vendors=[];state.markets=[];state.expandedRows={};state.approvedToday=0;state.filterPayment='';var saved=profile.settings||{};darkMode=!!saved.dark_mode;state.hideHints=!!saved.hide_hints;document.body.classList.toggle('dark',darkMode);document.getElementById('auth-screen').style.display='none';document.getElementById('dashboard').style.display='block';document.getElementById('nav-brand').innerHTML='<span>'+esc(profile.market_name)+'</span> &ndash; Dashboard';document.getElementById('nav-user').textContent=profile.coordinator_name;document.getElementById('pub-title').textContent=profile.market_name;await loadUserData();renderPending();updateMetrics();if(state.hideHints)document.querySelectorAll('.page-banner').forEach(el=>el.style.display='none');}
+async function loginAs(user,profile){currentUser={...user,market:profile.market_name,name:profile.coordinator_name,slug:profile.slug,payfastMerchantId:profile.payfast_merchant_id||null,payfastMerchantKey:profile.payfast_merchant_key||null,bankHolder:profile.bank_holder||null,bankName:profile.bank_name||null,bankAccNum:profile.bank_acc_num||null,bankBranch:profile.bank_branch||null,bankAccType:profile.bank_acc_type||null};state.vendors=[];state.markets=[];state.expandedRows={};state.approvedToday=0;state.filterPayment='';var saved=profile.settings||{};darkMode=!!saved.dark_mode;state.hideHints=!!saved.hide_hints;document.body.classList.toggle('dark',darkMode);document.getElementById('auth-screen').style.display='none';document.getElementById('dashboard').style.display='block';document.getElementById('nav-brand').innerHTML='<span>'+esc(profile.market_name)+'</span> &ndash; Dashboard';document.getElementById('nav-user').textContent=profile.coordinator_name;document.getElementById('pub-title').textContent=profile.market_name;await loadUserData();renderPending();updateMetrics();if(state.hideHints)document.querySelectorAll('.page-banner').forEach(el=>el.style.display='none');}
 async function doLogout(){await _sb.auth.signOut();currentUser=null;document.getElementById('dashboard').style.display='none';document.getElementById('auth-screen').style.display='flex';document.getElementById('login-email').value='';document.getElementById('login-password').value='';clearAuthMsg();switchAuthTab('login');}
 async function doForgotPassword(){var email=document.getElementById('forgot-email').value.trim().toLowerCase();if(!email){showAuthError('Please enter your email.');return;}var{error}=await _sb.auth.resetPasswordForEmail(email,{redirectTo:'https://picamarket.site/'});if(error){showAuthError(error.message);return;}showAuthSuccess('Reset link sent! Check your inbox.');}
 async function doResetPassword(){var pass=document.getElementById('reset-password-input').value;var confirm=document.getElementById('reset-password-confirm').value;var re=document.getElementById('reset-error'),rs=document.getElementById('reset-success');re.style.display='none';rs.style.display='none';if(!pass||!confirm){re.textContent='Please fill in both fields.';re.style.display='block';return;}if(pass.length<6){re.textContent='Password must be at least 6 characters.';re.style.display='block';return;}if(pass!==confirm){re.textContent='Passwords do not match.';re.style.display='block';return;}var{error}=await _sb.auth.updateUser({password:pass});if(error){re.textContent=error.message;re.style.display='block';return;}rs.textContent='Password updated! You can now log in.';rs.style.display='block';setTimeout(()=>{document.getElementById('reset-password-modal').classList.remove('open');},2000);}
@@ -291,7 +302,16 @@ function buildReminderEmail(v){
   var outstanding=v.markets.filter(mid=>(v.marketPayments||{})[mid]!=='paid');
   var rows=outstanding.map(function(mid){var m=state.markets.find(x=>x.id===mid);return'<tr><td style="padding:6px 12px 6px 0">'+(m?esc(m.name):mid)+'</td><td style="padding:6px 0;font-weight:500">R'+getStallFee(v,m)+'</td></tr>';}).join('');
   var total=outstanding.reduce(function(t,mid){var m=state.markets.find(x=>x.id===mid);return t+getStallFee(v,m);},0);
-  return'<p>Hi <strong>'+esc(v.name)+'</strong>,</p><p>This is a friendly reminder that you have outstanding stall fees for <strong>'+esc(currentUser.market)+'</strong>.</p><table style="border-collapse:collapse;margin:12px 0">'+rows+'<tr style="border-top:1px solid #e5e7eb"><td style="padding:8px 12px 4px 0;font-weight:600">Total outstanding</td><td style="padding:8px 0 4px;font-weight:600">R'+total+'</td></tr></table><p>Please arrange payment at your earliest convenience. If you have any questions, feel free to reply to this email.</p><p>Thank you,<br><strong>'+esc(currentUser.market)+' team</strong></p>';
+  var paySection='';
+  var hasPF=currentUser.payfastMerchantId&&currentUser.payfastMerchantKey;
+  var hasBank=currentUser.bankHolder&&currentUser.bankName&&currentUser.bankAccNum;
+  if(hasPF||hasBank){
+    paySection='<p style="margin-top:16px"><strong>How to pay:</strong></p>';
+    if(hasPF&&outstanding.length===1){var m=state.markets.find(x=>x.id===outstanding[0]);if(m){var url=pfUrl(v,m);paySection+='<p>&#128179; <a href="'+url+'" style="color:#2563eb">Pay via PayFast — R'+getStallFee(v,m)+'</a></p>';}}
+    else if(hasPF){paySection+='<p>&#128179; Pay via PayFast — your coordinator will send individual payment links for each market.</p>';}
+    if(hasBank){paySection+='<p style="margin-top:12px">&#127968; <strong>EFT / Bank transfer:</strong><br>'+'Account holder: <strong>'+esc(currentUser.bankHolder)+'</strong><br>'+'Bank: <strong>'+esc(currentUser.bankName)+'</strong><br>'+'Account number: <strong>'+esc(currentUser.bankAccNum)+'</strong>'+(currentUser.bankBranch?'<br>Branch code: <strong>'+esc(currentUser.bankBranch)+'</strong>':'')+(currentUser.bankAccType?'<br>Account type: <strong>'+esc(currentUser.bankAccType)+'</strong>':'')+'<br><em style="font-size:12px;color:#6b7280">Please use your stall name as the payment reference.</em></p>';}
+  }
+  return'<p>Hi <strong>'+esc(v.name)+'</strong>,</p><p>This is a friendly reminder that you have outstanding stall fees for <strong>'+esc(currentUser.market)+'</strong>.</p><table style="border-collapse:collapse;margin:12px 0">'+rows+'<tr style="border-top:1px solid #e5e7eb"><td style="padding:8px 12px 4px 0;font-weight:600">Total outstanding</td><td style="padding:8px 0 4px;font-weight:600">R'+total+'</td></tr></table>'+paySection+'<p style="margin-top:16px">If you have any questions, feel free to reply to this email.</p><p>Thank you,<br><strong>'+esc(currentUser.market)+' team</strong></p>';
 }
 
 function sendPaymentReminderEmail(v){
