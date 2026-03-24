@@ -42,6 +42,14 @@ body.dark{--bg:#1c1c1a;--bg2:#131310;--bg3:#252520;--border:rgba(255,255,255,0.0
 .sm-badge{font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500;background:var(--green-bg);color:var(--green)}
 .sm-badge.off{background:var(--bg3);color:var(--text3)}
 
+/* ── SIDEBAR ────────────────────────────────────────────────────── */
+.sidebar{display:none;position:fixed;left:0;top:var(--nav-h);bottom:0;width:56px;background:var(--bg);border-right:1px solid var(--border);z-index:90;overflow:hidden;flex-direction:column;padding:8px 0;transition:width 0.22s cubic-bezier(0.4,0,0.2,1)}
+.sidebar:hover{width:210px;box-shadow:2px 0 16px rgba(0,0,0,0.06)}
+.sidebar-item{display:flex;align-items:center;gap:12px;padding:11px 18px;cursor:pointer;color:var(--text3);font-size:13px;font-weight:500;border:none;background:none;white-space:nowrap;width:100%;text-align:left;transition:color 0.15s,background 0.15s;font-family:inherit}
+.sidebar-item:hover{color:var(--text);background:var(--bg3)}
+.sidebar-item.active{color:var(--text)}
+.sidebar-item svg{width:20px;height:20px;min-width:20px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
 /* ── BOTTOM NAV ────────────────────────────────────────────────── */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--bottom-h);background:var(--bg);border-top:1px solid var(--border);z-index:100;align-items:stretch}
 .bottom-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--text3);font-size:10px;padding:6px 4px;border:none;background:none;-webkit-tap-highlight-color:transparent;transition:color 0.15s;font-family:inherit}
@@ -226,9 +234,13 @@ select.form-input{font-size:14px}
 }
 @media(min-width:768px){
   .nav-mobile-right{display:none}
+  .nav-tabs{display:none}
+  .sidebar{display:flex}
+  .dashboard-main{margin-left:56px}
   .desktop-table{display:table}
   .mobile-cards{display:none}
   .expand-inner{grid-template-columns:1fr 1fr}
+  .page{padding-bottom:1.25rem}
 }
 @media(min-width:768px) and (max-width:1023px){
   .metric-grid{grid-template-columns:repeat(2,1fr)}

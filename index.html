@@ -81,6 +81,13 @@
     <button class="bottom-nav-item" onclick="showPage('markets')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Markets</span></button>
   </nav>
 
+  <aside class="sidebar" id="sidebar">
+    <button class="sidebar-item active" onclick="showPage('approval')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Vendor Approval</span></button>
+    <button class="sidebar-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Approved Vendors</span></button>
+    <button class="sidebar-item" onclick="showPage('markets')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Markets</span></button>
+  </aside>
+
+  <div class="dashboard-main">
   <div id="page-approval" class="page active">
     <div class="page-banner amber"><div class="page-banner-icon">&#9998;</div><div><div class="page-banner-title">Vendor Approval</div><div class="page-banner-desc">New applications submitted via your public vendor page appear here. Click a stall name to expand the full application — including their description, requested markets, photos, and contact email. Tick one or more vendors using the checkboxes, then use <strong>Approve</strong> to accept (you'll choose which markets they may attend) or <strong>Remove</strong> to decline. <strong>Refresh</strong> pulls in any new submissions since the page loaded. <strong>Export CSV</strong> downloads the current list as a spreadsheet.</div></div></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px" class="page-actions">
@@ -172,6 +179,7 @@
         </div>
       </div>
     </div></div>
+  </div>
   </div>
 </div>
 
