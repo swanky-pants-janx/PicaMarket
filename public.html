@@ -142,18 +142,17 @@ function renderVendorFormMarkets() {
   if (!markets.length) { el.innerHTML = ''; noM.style.display = 'block'; return; }
   noM.style.display = 'none';
   el.innerHTML = markets.map(function(m) {
-    var hasLarge = m.fee_large > 0;
-    var hasFood = m.fee_food > 0;
-    var hasOptions = hasLarge || hasFood;
+    var types = m.stall_types && m.stall_types.length ? m.stall_types : [{id:'normal-stall',name:'Normal stall',fee:m.fee||350,color:'#6b7280'}];
+    var hasOptions = types.length > 1;
     var stallOptions = '';
     if (hasOptions) {
       stallOptions = '<div class="stall-type-group" onclick="event.stopPropagation()" style="margin-top:10px;display:flex;flex-direction:column;gap:6px">'
-        + '<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="radio" name="st-'+m.id+'" value="normal" checked style="accent-color:var(--blue)"> Normal stall — R'+(m.fee||350)+'/date</label>'
-        + (hasLarge ? '<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="radio" name="st-'+m.id+'" value="large" style="accent-color:var(--blue)"> Large stall — R'+m.fee_large+'/date</label>' : '')
-        + (hasFood ? '<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="radio" name="st-'+m.id+'" value="food" style="accent-color:var(--blue)"> Food vendor — R'+m.fee_food+'/date</label>' : '')
+        + types.map(function(t, i) {
+            return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="radio" name="st-'+m.id+'" value="'+esc(t.id)+'"'+(i===0?' checked':'')+' style="accent-color:var(--blue)"><span style="width:10px;height:10px;border-radius:50%;background:'+(t.color||'#6b7280')+';display:inline-block;flex-shrink:0"></span> '+esc(t.name)+' — R'+t.fee+'/date</label>';
+          }).join('')
         + '</div>';
     }
-    var feeText = hasOptions ? 'From R'+(m.fee||350)+'/date' : 'Stall fee: R'+(m.fee||350)+'/date';
+    var feeText = hasOptions ? 'From R'+types[0].fee+'/date' : 'Stall fee: R'+types[0].fee+'/date';
     return '<div class="market-select-card" onclick="toggleMktCheck(\''+m.id+'\',this)"><input type="checkbox" class="v-mkt-check" id="vc-'+m.id+'" value="'+m.id+'" onclick="event.stopPropagation();this.closest(\'.market-select-card\').classList.toggle(\'selected\',this.checked)"><div style="flex:1"><div class="msc-name">'+esc(m.name)+'</div><div class="msc-dates">'+((m.dates||[]).join(' · ')||'Dates TBC')+'</div><div class="msc-fee">'+feeText+'</div>'+stallOptions+'</div></div>';
   }).join('');
 }
