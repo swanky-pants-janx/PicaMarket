@@ -186,12 +186,8 @@
       <div id="pub-apply" style="display:none">
         <div class="card">
           <h3 style="margin-bottom:1rem">Vendor application</h3>
-          <div class="form-group"><label class="form-label">Stall / shop name *</label><input class="form-input" id="v-name" type="text" placeholder="e.g. Sunshine Bakes"></div>
-          <div class="form-group"><label class="form-label">Description of what you sell *</label><textarea class="form-input" id="v-desc" placeholder="Tell us about your stall..."></textarea></div>
-          <div class="form-group"><label class="form-label">Contact email *</label><input class="form-input" id="v-email" type="email" placeholder="you@example.com"></div>
+          <div id="dashboard-form-fields"></div>
           <div class="form-group"><label class="form-label">Select markets to attend *</label><div id="v-market-checks" style="margin-top:8px"></div><div id="v-no-markets" style="font-size:13px;color:var(--text2);display:none">No published markets available yet.</div></div>
-          <div id="dashboard-custom-fields"></div>
-          <div class="form-group"><label class="form-label">Photos of your stall / products</label><div class="upload-box"><input type="file" accept="image/*" multiple onchange="handleVendorImages(event)"><div>&#8679; Tap to add photos (max 4)</div></div><div id="vendor-img-thumbs" class="img-thumb-grid"></div></div>
           <button class="btn primary" style="width:100%;margin-top:0.5rem;padding:12px" onclick="submitVendorForm()">Submit application</button>
           <div id="v-success" style="display:none;margin-top:1rem;padding:12px;border-radius:8px;background:var(--green-bg);color:var(--green);font-size:13px;text-align:center;border:0.5px solid var(--green)">Application submitted! You'll be notified by email if approved.</div>
         </div>

@@ -56,19 +56,11 @@
       <div id="pub-apply" style="display:none">
         <div class="card">
           <h3 style="margin-bottom:1rem">Vendor application</h3>
-          <div class="form-group"><label class="form-label">Stall / shop name *</label><input class="form-input" id="v-name" type="text" placeholder="e.g. Sunshine Bakes"></div>
-          <div class="form-group"><label class="form-label">Description of what you sell *</label><textarea class="form-input" id="v-desc" placeholder="Tell us about your stall..."></textarea></div>
-          <div class="form-group"><label class="form-label">Contact email *</label><input class="form-input" id="v-email" type="email" placeholder="you@example.com"></div>
+          <div id="vendor-form-fields"></div>
           <div class="form-group">
             <label class="form-label">Select markets to attend *</label>
             <div id="v-market-checks" style="margin-top:8px"></div>
             <div id="v-no-markets" style="font-size:13px;color:var(--text2);display:none">No published markets available yet.</div>
-          </div>
-          <div id="custom-fields-section"></div>
-          <div class="form-group">
-            <label class="form-label">Photos of your stall / products</label>
-            <div class="upload-box"><input type="file" accept="image/*" multiple onchange="handleVendorImages(event)"><div>&#8679; Tap to add photos (max 4)</div></div>
-            <div id="vendor-img-thumbs" class="img-thumb-grid"></div>
           </div>
           <!-- honeypot: never visible to real users, bots fill it -->
           <input type="text" id="hp-field" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
@@ -118,20 +110,32 @@ async function init() {
 
   renderMarkets();
   renderVendorFormMarkets();
-  renderCustomFields(profile.settings&&profile.settings.custom_fields||[]);
+  renderVendorForm(profile.settings&&profile.settings.form_fields||null);
 }
 
-function renderCustomFields(fields){
-  var container=document.getElementById('custom-fields-section');
-  if(!fields||!fields.length){container.innerHTML='';return;}
+var DEFAULT_FORM_FIELDS=[
+  {id:'builtin-name',type:'text',label:'Stall / shop name',required:true,builtin:true},
+  {id:'builtin-desc',type:'textarea',label:'Description of what you sell',required:true,builtin:true},
+  {id:'builtin-email',type:'email',label:'Contact email',required:true,builtin:true},
+  {id:'builtin-photos',type:'photos',label:'Photos of your stall / products',required:false,builtin:true},
+];
+function renderVendorForm(fields){
+  if(!fields||!fields.length)fields=DEFAULT_FORM_FIELDS;
+  var container=document.getElementById('vendor-form-fields');
   container.innerHTML=fields.map(function(f){
-    var reqMark=f.required?' *':'';
-    var input='';
-    if(f.type==='text')input='<input class="form-input" id="cf-'+f.id+'" type="text">';
-    else if(f.type==='textarea')input='<textarea class="form-input" id="cf-'+f.id+'" rows="3"></textarea>';
-    else if(f.type==='select')input='<select class="form-input" id="cf-'+f.id+'"><option value="">Select...</option>'+(f.options||[]).map(function(o){return'<option value="'+esc(o)+'">'+esc(o)+'</option>';}).join('')+'</select>';
-    else if(f.type==='radio')input=(f.options||[]).map(function(o){return'<label style="display:flex;align-items:center;gap:8px;margin:6px 0;cursor:pointer;font-size:14px"><input type="radio" name="cf-'+f.id+'" value="'+esc(o)+'" style="accent-color:var(--blue)"> '+esc(o)+'</label>';}).join('');
-    else if(f.type==='checkbox')input=(f.options||[]).map(function(o){return'<label style="display:flex;align-items:center;gap:8px;margin:6px 0;cursor:pointer;font-size:14px"><input type="checkbox" class="cf-cb-'+f.id+'" value="'+esc(o)+'" style="accent-color:var(--blue)"> '+esc(o)+'</label>';}).join('');
+    var reqMark=f.required?' *':'';var input='';
+    if(f.builtin){
+      if(f.id==='builtin-name')input='<input class="form-input" id="v-name" type="text" placeholder="e.g. Sunshine Bakes">';
+      else if(f.id==='builtin-desc')input='<textarea class="form-input" id="v-desc" placeholder="Tell us about your stall..."></textarea>';
+      else if(f.id==='builtin-email')input='<input class="form-input" id="v-email" type="email" placeholder="you@example.com">';
+      else if(f.id==='builtin-photos')input='<div class="upload-box"><input type="file" accept="image/*" multiple onchange="handleVendorImages(event)"><div>&#8679; Tap to add photos (max 4)</div></div><div id="vendor-img-thumbs" class="img-thumb-grid"></div>';
+    }else{
+      if(f.type==='text')input='<input class="form-input" id="cf-'+f.id+'" type="text">';
+      else if(f.type==='textarea')input='<textarea class="form-input" id="cf-'+f.id+'" rows="3"></textarea>';
+      else if(f.type==='select')input='<select class="form-input" id="cf-'+f.id+'"><option value="">Select...</option>'+(f.options||[]).map(function(o){return'<option value="'+esc(o)+'">'+esc(o)+'</option>';}).join('')+'</select>';
+      else if(f.type==='radio')input=(f.options||[]).map(function(o){return'<label style="display:flex;align-items:center;gap:8px;margin:6px 0;cursor:pointer;font-size:14px"><input type="radio" name="cf-'+f.id+'" value="'+esc(o)+'" style="accent-color:var(--blue)"> '+esc(o)+'</label>';}).join('');
+      else if(f.type==='checkbox')input=(f.options||[]).map(function(o){return'<label style="display:flex;align-items:center;gap:8px;margin:6px 0;cursor:pointer;font-size:14px"><input type="checkbox" class="cf-cb-'+f.id+'" value="'+esc(o)+'" style="accent-color:var(--blue)"> '+esc(o)+'</label>';}).join('');
+    }
     return'<div class="form-group"><label class="form-label">'+esc(f.label)+reqMark+'</label>'+input+'</div>';
   }).join('');
 }
@@ -231,7 +235,7 @@ async function submitVendorForm() {
   if (!name||!desc||!email) { alert('Please fill in all required fields.'); return; }
   if (!selectedMarkets.length) { alert('Please select at least one market.'); return; }
   if (!email.includes('@')) { alert('Please enter a valid email address.'); return; }
-  var customFields=coordinator.settings&&coordinator.settings.custom_fields||[];
+  var customFields=(coordinator.settings&&coordinator.settings.form_fields||[]).filter(function(f){return!f.builtin;});
   var customResponses=collectCustomResponses(customFields);
   for(var i=0;i<customFields.length;i++){var cf=customFields[i];if(cf.required){var val=customResponses[cf.id];if(!val||(Array.isArray(val)&&!val.length)){alert('Please fill in: '+cf.label);return;}}}
   var marketStallTypes = {};
@@ -293,10 +297,8 @@ async function submitVendorForm() {
 
   if (error) { alert('Something went wrong. Please try again.'); console.error(error); return; }
 
-  document.getElementById('v-name').value='';
-  document.getElementById('v-desc').value='';
-  document.getElementById('v-email').value='';
-  _vendorImages=[]; renderVendorThumbs();
+  _vendorImages=[];
+  renderVendorForm(coordinator.settings&&coordinator.settings.form_fields||null);
   document.querySelectorAll('.v-mkt-check').forEach(function(c){c.checked=false;c.closest('.market-select-card').classList.remove('selected');});
   if (window.turnstile) window.turnstile.reset();
   var s = document.getElementById('v-success');
