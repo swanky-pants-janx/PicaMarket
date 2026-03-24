@@ -64,6 +64,7 @@
             <div id="v-market-checks" style="margin-top:8px"></div>
             <div id="v-no-markets" style="font-size:13px;color:var(--text2);display:none">No published markets available yet.</div>
           </div>
+          <div id="custom-fields-section"></div>
           <div class="form-group">
             <label class="form-label">Photos of your stall / products</label>
             <div class="upload-box"><input type="file" accept="image/*" multiple onchange="handleVendorImages(event)"><div>&#8679; Tap to add photos (max 4)</div></div>
@@ -117,6 +118,32 @@ async function init() {
 
   renderMarkets();
   renderVendorFormMarkets();
+  renderCustomFields(profile.settings&&profile.settings.custom_fields||[]);
+}
+
+function renderCustomFields(fields){
+  var container=document.getElementById('custom-fields-section');
+  if(!fields||!fields.length){container.innerHTML='';return;}
+  container.innerHTML=fields.map(function(f){
+    var reqMark=f.required?' *':'';
+    var input='';
+    if(f.type==='text')input='<input class="form-input" id="cf-'+f.id+'" type="text">';
+    else if(f.type==='textarea')input='<textarea class="form-input" id="cf-'+f.id+'" rows="3"></textarea>';
+    else if(f.type==='select')input='<select class="form-input" id="cf-'+f.id+'"><option value="">Select...</option>'+(f.options||[]).map(function(o){return'<option value="'+esc(o)+'">'+esc(o)+'</option>';}).join('')+'</select>';
+    else if(f.type==='radio')input=(f.options||[]).map(function(o){return'<label style="display:flex;align-items:center;gap:8px;margin:6px 0;cursor:pointer;font-size:14px"><input type="radio" name="cf-'+f.id+'" value="'+esc(o)+'" style="accent-color:var(--blue)"> '+esc(o)+'</label>';}).join('');
+    else if(f.type==='checkbox')input=(f.options||[]).map(function(o){return'<label style="display:flex;align-items:center;gap:8px;margin:6px 0;cursor:pointer;font-size:14px"><input type="checkbox" class="cf-cb-'+f.id+'" value="'+esc(o)+'" style="accent-color:var(--blue)"> '+esc(o)+'</label>';}).join('');
+    return'<div class="form-group"><label class="form-label">'+esc(f.label)+reqMark+'</label>'+input+'</div>';
+  }).join('');
+}
+function collectCustomResponses(fields){
+  var responses={};
+  (fields||[]).forEach(function(f){
+    if(f.type==='text'||f.type==='textarea'){var el=document.getElementById('cf-'+f.id);if(el)responses[f.id]=el.value.trim();}
+    else if(f.type==='select'){var el=document.getElementById('cf-'+f.id);if(el)responses[f.id]=el.value;}
+    else if(f.type==='radio'){var el=document.querySelector('input[name="cf-'+f.id+'"]:checked');if(el)responses[f.id]=el.value;}
+    else if(f.type==='checkbox'){responses[f.id]=Array.from(document.querySelectorAll('.cf-cb-'+f.id+':checked')).map(function(el){return el.value;});}
+  });
+  return responses;
 }
 
 function sendEmail(to,subject,html){fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/resend-email',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_f64M7MFa88zOMuZ083v-lw_Ypgcyhx-'},body:JSON.stringify({to,subject,html})}).catch(function(err){console.error('Email error:',err);});
@@ -204,6 +231,9 @@ async function submitVendorForm() {
   if (!name||!desc||!email) { alert('Please fill in all required fields.'); return; }
   if (!selectedMarkets.length) { alert('Please select at least one market.'); return; }
   if (!email.includes('@')) { alert('Please enter a valid email address.'); return; }
+  var customFields=coordinator.settings&&coordinator.settings.custom_fields||[];
+  var customResponses=collectCustomResponses(customFields);
+  for(var i=0;i<customFields.length;i++){var cf=customFields[i];if(cf.required){var val=customResponses[cf.id];if(!val||(Array.isArray(val)&&!val.length)){alert('Please fill in: '+cf.label);return;}}}
   var marketStallTypes = {};
   selectedMarkets.forEach(function(mid) {
     var sel = document.querySelector('input[name="st-'+mid+'"]:checked');
@@ -251,7 +281,8 @@ async function submitVendorForm() {
     pay_status: 'outstanding',
     pay_method: null,
     images: _vendorImages.slice(),
-    submitted_at: new Date().toLocaleDateString('en-ZA')
+    submitted_at: new Date().toLocaleDateString('en-ZA'),
+    ...(customFields.length&&Object.keys(customResponses).length?{custom_responses:customResponses}:{})
   });
 
   btn.textContent = 'Submit application'; btn.disabled = false;

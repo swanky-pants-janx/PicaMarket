@@ -39,6 +39,16 @@ body.dark{--bg:#1c1c1a;--bg2:#131310;--bg3:#252520;--border:rgba(255,255,255,0.0
 .settings-menu button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 20px;background:none;border:none;cursor:pointer;font-size:14px;color:var(--text);text-align:left;gap:16px;transition:background 0.1s;font-family:inherit}
 .settings-menu button:hover{background:var(--bg3)}
 .settings-menu .sm-sep{border:none;border-top:1px solid var(--border);margin:4px 0}
+/* ── FORM BUILDER ───────────────────────────────────────────────── */
+.fb-field-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:0.5px solid var(--border);flex-wrap:wrap}
+.fb-field-card:last-child{border-bottom:none}
+.fb-field-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;flex-wrap:wrap}
+.fb-field-label{font-size:14px;font-weight:500;color:var(--text)}
+.fb-type-badge{font-size:10px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--bg3);color:var(--text2);white-space:nowrap;flex-shrink:0}
+.fb-field-actions{display:flex;gap:6px;flex-shrink:0}
+.fb-option-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.fb-option-row button{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text3);padding:0 4px;line-height:1}
+.fb-option-row button:hover{color:var(--red)}
 .blocked-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px;color:var(--text)}
 .blocked-row button{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text3);line-height:1;padding:0 4px}
 .blocked-row button:hover{color:var(--red)}

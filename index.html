@@ -64,6 +64,7 @@
       <div class="nav-tab active" onclick="showPage('approval')">Vendor Approval</div>
       <div class="nav-tab" onclick="showPage('approved')">Approved Vendors</div>
       <div class="nav-tab" onclick="showPage('markets')">Markets</div>
+      <div class="nav-tab" onclick="showPage('form-builder')">Form Builder</div>
     </div>
     <div class="nav-right">
       <span class="nav-user" id="nav-user"></span>
@@ -79,12 +80,14 @@
     <button class="bottom-nav-item active" onclick="showPage('approval')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Approval</span></button>
     <button class="bottom-nav-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Vendors</span></button>
     <button class="bottom-nav-item" onclick="showPage('markets')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Markets</span></button>
+    <button class="bottom-nav-item" onclick="showPage('form-builder')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M17 5h1a2 2 0 012 2v13a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h1"/><path d="M9 12h6M9 16h4"/></svg><span>Form</span></button>
   </nav>
 
   <aside class="sidebar" id="sidebar">
     <button class="sidebar-item active" onclick="showPage('approval')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Vendor Approval</span></button>
     <button class="sidebar-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Approved Vendors</span></button>
     <button class="sidebar-item" onclick="showPage('markets')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Markets</span></button>
+    <button class="sidebar-item" onclick="showPage('form-builder')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M17 5h1a2 2 0 012 2v13a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h1"/><path d="M9 12h6M9 16h4"/></svg><span>Form Builder</span></button>
     <div class="sidebar-spacer"></div>
     <div class="sidebar-user" id="sidebar-user"></div>
     <div class="sidebar-divider"></div>
@@ -161,6 +164,15 @@
     <div id="mdb-content"></div>
   </div>
 
+  <div id="page-form-builder" class="page">
+    <div class="page-banner" style="background:var(--bg);border:0.5px solid var(--border)"><div class="page-banner-icon">&#9998;</div><div><div class="page-banner-title">Form Builder</div><div class="page-banner-desc">Add custom questions to your vendor application form. Vendors will see these fields when they apply. Responses appear in the expanded vendor row on the Vendor Approval page. Field types: <strong>Short text</strong>, <strong>Long text</strong>, <strong>Single choice</strong> (radio), <strong>Multiple choice</strong> (checkboxes), <strong>Dropdown</strong>. Mark fields as required to prevent submission without an answer.</div></div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px">
+      <h2 style="margin:0">Application Form</h2>
+      <button class="btn primary" onclick="openAddField()">+ Add field</button>
+    </div>
+    <div id="fb-fields-container"></div>
+  </div>
+
   <div id="page-public" class="page" style="padding:0;max-width:100%">
     <div style="background:var(--bg2);min-height:calc(100vh - var(--nav-h))">
     <div class="public-page">
@@ -178,6 +190,7 @@
           <div class="form-group"><label class="form-label">Description of what you sell *</label><textarea class="form-input" id="v-desc" placeholder="Tell us about your stall..."></textarea></div>
           <div class="form-group"><label class="form-label">Contact email *</label><input class="form-input" id="v-email" type="email" placeholder="you@example.com"></div>
           <div class="form-group"><label class="form-label">Select markets to attend *</label><div id="v-market-checks" style="margin-top:8px"></div><div id="v-no-markets" style="font-size:13px;color:var(--text2);display:none">No published markets available yet.</div></div>
+          <div id="dashboard-custom-fields"></div>
           <div class="form-group"><label class="form-label">Photos of your stall / products</label><div class="upload-box"><input type="file" accept="image/*" multiple onchange="handleVendorImages(event)"><div>&#8679; Tap to add photos (max 4)</div></div><div id="vendor-img-thumbs" class="img-thumb-grid"></div></div>
           <button class="btn primary" style="width:100%;margin-top:0.5rem;padding:12px" onclick="submitVendorForm()">Submit application</button>
           <div id="v-success" style="display:none;margin-top:1rem;padding:12px;border-radius:8px;background:var(--green-bg);color:var(--green);font-size:13px;text-align:center;border:0.5px solid var(--green)">Application submitted! You'll be notified by email if approved.</div>
@@ -379,6 +392,41 @@
   </div>
   <div id="blocked-list"></div>
   <div style="margin-top:1.25rem"><button class="btn" style="width:100%" onclick="closeModal('blocked-vendors-modal')">Done</button></div>
+</div></div>
+
+<div class="modal-overlay" id="field-modal"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-header"><h3 id="field-modal-title">Add field</h3><button class="modal-close" onclick="closeModal('field-modal')">&#x2715;</button></div>
+  <div class="form-group">
+    <label class="form-label">Field type</label>
+    <select class="form-input" id="field-type" onchange="syncFieldModal()">
+      <option value="text">Short text</option>
+      <option value="textarea">Long text (paragraph)</option>
+      <option value="radio">Single choice (radio buttons)</option>
+      <option value="checkbox">Multiple choice (checkboxes)</option>
+      <option value="select">Dropdown</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Question / label *</label>
+    <input class="form-input" id="field-label" type="text" placeholder="e.g. Do you have your own table?">
+  </div>
+  <div class="form-group">
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+      <input type="checkbox" id="field-required" style="width:16px;height:16px;accent-color:var(--blue)">
+      <span class="form-label" style="margin:0">Required — vendor must answer this to submit</span>
+    </label>
+  </div>
+  <div id="field-options-section" style="display:none">
+    <div class="form-group">
+      <label class="form-label">Options</label>
+      <div id="field-options-list"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input class="form-input" id="field-option-input" placeholder="Type an option and press Enter..." onkeydown="if(event.key==='Enter'){event.preventDefault();addFieldOption();}">
+        <button class="btn" onclick="addFieldOption()" style="white-space:nowrap">Add</button>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:1rem"><button class="btn" style="flex:1" onclick="closeModal('field-modal')">Cancel</button><button class="btn primary" style="flex:1;padding:12px" onclick="saveField()">Save field</button></div>
 </div></div>
 
 <div class="modal-overlay" id="reset-password-modal"><div class="modal"><div class="modal-handle"></div>
