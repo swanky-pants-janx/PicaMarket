@@ -70,7 +70,7 @@ function sendPasswordResetFromAccount(){_sb.auth.resetPasswordForEmail(currentUs
 function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 function uid(){return crypto.randomUUID();}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
-function makeSlug(n){return n.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-');}
+function makeSlug(n){var s=n.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-');return s||Math.random().toString(36).slice(2,10);}
 
 // ── AUTH ─────────────────────────────────────────────────────────
 var currentUser=null;
