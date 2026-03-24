@@ -103,7 +103,7 @@ h3{font-size:14px;font-weight:600;letter-spacing:-0.01em;margin-bottom:0.75rem;c
 
 /* ── BUTTONS ───────────────────────────────────────────────────── */
 .btn{padding:8px 14px;border:1px solid var(--border2);border-radius:8px;background:var(--bg);cursor:pointer;font-size:13px;color:var(--text);-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:all 0.15s;font-family:inherit;font-weight:400}
-.btn:hover{background:var(--bg3)}.btn:active{opacity:0.8}
+.btn:hover{background:var(--bg3)}.btn:active{opacity:0.8}.btn:disabled{opacity:0.4;cursor:not-allowed;pointer-events:none}
 .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text);font-weight:500}
 .btn.primary:hover{opacity:0.85}
 .btn.success{background:var(--green-bg);color:var(--green);border-color:var(--green)}
