@@ -110,7 +110,10 @@
     <div class="page-banner green"><div class="page-banner-icon">&#10003;</div><div><div class="page-banner-title">Approved Vendors</div><div class="page-banner-desc">Click a vendor name to expand their per-market payment breakdown. Use the ⋮ menu to add markets, credit to another market, update payment, or remove a vendor.</div></div></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px" class="page-actions">
       <h2 style="margin:0">Approved Vendors</h2>
-      <button class="btn" onclick="exportCSV('approved')">Export CSV</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="sendBulkPaymentReminders()">&#9993; Send reminders</button>
+        <button class="btn" onclick="exportCSV('approved')">Export CSV</button>
+      </div>
     </div>
     <div class="metric-grid">
       <div class="metric"><div class="metric-label">Total approved</div><div class="metric-value blue" id="m-app-total">0</div></div>
@@ -192,6 +195,7 @@
   <button onclick="dotMenuAction('addmarket')">&#43; Add to market</button>
   <button onclick="dotMenuAction('credit')">&#8631; Credit to another market</button>
   <button onclick="dotMenuAction('pay')">&#128179; Update payment</button>
+  <button onclick="dotMenuAction('reminder')" id="dot-reminder-btn">&#9993; Send payment reminder</button>
   <button onclick="dotMenuAction('remove')" class="danger">&#128465; Remove vendor</button>
 </div>
 

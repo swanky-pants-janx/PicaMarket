@@ -235,11 +235,14 @@ function openDotMenu(e,vid){
   var v=state.vendors.find(x=>x.id===vid);
   var menu=document.getElementById('dot-menu');
   document.getElementById('dot-menu-label').textContent=v?v.name:'';
+  var isPaid=v&&calcPayStatus(v)==='paid';
+  var rb=document.getElementById('dot-reminder-btn');
+  rb.disabled=isPaid;rb.style.opacity=isPaid?'0.4':'';rb.style.cursor=isPaid?'not-allowed':'';
   menu.style.display='block';
   var rect=e.currentTarget.getBoundingClientRect();
   var top=rect.bottom+6,left=rect.right-200;
   if(left<8)left=8;
-  if(top+180>window.innerHeight)top=rect.top-190;
+  if(top+200>window.innerHeight)top=rect.top-210;
   menu.style.top=top+'px';menu.style.left=left+'px';
 }
 document.addEventListener('click',function(e){var dm=document.getElementById('dot-menu');if(dm&&dm.style.display==='block'&&!dm.contains(e.target))dm.style.display='none';var sm=document.getElementById('settings-menu');if(sm&&sm.style.display==='block'&&!sm.contains(e.target))sm.style.display='none';});
@@ -276,10 +279,35 @@ function dotMenuAction(action){
       sel3.appendChild(opt);
     });
     document.getElementById('pay-modal').classList.add('open');
+  } else if(action==='reminder'){
+    sendPaymentReminderEmail(v);
   } else if(action==='remove'){
     document.getElementById('remove-approved-name').textContent=v.name;
     document.getElementById('remove-approved-modal').classList.add('open');
   }
+}
+
+function buildReminderEmail(v){
+  var outstanding=v.markets.filter(mid=>(v.marketPayments||{})[mid]!=='paid');
+  var rows=outstanding.map(function(mid){var m=state.markets.find(x=>x.id===mid);return'<tr><td style="padding:6px 12px 6px 0">'+(m?esc(m.name):mid)+'</td><td style="padding:6px 0;font-weight:500">R'+getStallFee(v,m)+'</td></tr>';}).join('');
+  var total=outstanding.reduce(function(t,mid){var m=state.markets.find(x=>x.id===mid);return t+getStallFee(v,m);},0);
+  return'<p>Hi <strong>'+esc(v.name)+'</strong>,</p><p>This is a friendly reminder that you have outstanding stall fees for <strong>'+esc(currentUser.market)+'</strong>.</p><table style="border-collapse:collapse;margin:12px 0">'+rows+'<tr style="border-top:1px solid #e5e7eb"><td style="padding:8px 12px 4px 0;font-weight:600">Total outstanding</td><td style="padding:8px 0 4px;font-weight:600">R'+total+'</td></tr></table><p>Please arrange payment at your earliest convenience. If you have any questions, feel free to reply to this email.</p><p>Thank you,<br><strong>'+esc(currentUser.market)+' team</strong></p>';
+}
+
+function sendPaymentReminderEmail(v){
+  if(calcPayStatus(v)==='paid'){showToast('Vendor is fully paid');return;}
+  var outstanding=v.markets.filter(mid=>(v.marketPayments||{})[mid]!=='paid');
+  if(!outstanding.length){showToast('No outstanding markets');return;}
+  sendEmail(v.email,'Payment reminder — '+currentUser.market,buildReminderEmail(v));
+  showToast('Reminder sent to '+v.name);
+}
+
+function sendBulkPaymentReminders(){
+  var outstanding=state.vendors.filter(v=>calcPayStatus(v)!=='paid');
+  if(!outstanding.length){showToast('No outstanding vendors');return;}
+  if(!confirm('Send payment reminder emails to '+outstanding.length+' vendor'+(outstanding.length===1?'':'s')+'?'))return;
+  outstanding.forEach(function(v){sendEmail(v.email,'Payment reminder — '+currentUser.market,buildReminderEmail(v));});
+  showToast('Reminders sent to '+outstanding.length+' vendor'+(outstanding.length===1?'':'s'));
 }
 
 // ── PAY MODAL FLOW ────────────────────────────────────────────────
