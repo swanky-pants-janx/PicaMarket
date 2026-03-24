@@ -8,9 +8,15 @@
 <style>
   #toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--text);color:var(--bg);padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:opacity 0.2s,transform 0.2s;pointer-events:none;z-index:9999;white-space:nowrap}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .mf-row{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+  .mf-row{display:grid;gap:14px;grid-template-columns:1fr 1fr}
   .mf-row .form-group{margin-bottom:0}
-  .mf-section-label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);margin:1.25rem 0 0.75rem;padding-bottom:6px;border-bottom:0.5px solid var(--border)}
+  .mf-section-label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);margin:1.75rem 0 1rem;padding-bottom:8px;border-bottom:0.5px solid var(--border)}
+  .mf-section-label:first-of-type{margin-top:0.25rem}
+  .modal-market{max-width:780px!important;padding:2rem 2.25rem!important}
+  .modal-market .form-group{margin-bottom:1.25rem}
+  .modal-market .form-label{font-size:14px;margin-bottom:8px}
+  .modal-market .form-input{padding:11px 14px}
+  @media(max-width:767px){.modal-market{padding:1.5rem!important}}
   @media(max-width:540px){.mf-row{grid-template-columns:1fr}}
 </style>
 </head>
@@ -263,7 +269,7 @@
   <div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="closeModal('credit-modal')">Cancel</button><button class="btn primary" style="flex:1" onclick="confirmCredit()">Confirm credit</button></div>
 </div></div>
 
-<div class="modal-overlay" id="market-modal"><div class="modal" style="max-width:680px"><div class="modal-handle"></div>
+<div class="modal-overlay" id="market-modal"><div class="modal modal-market"><div class="modal-handle"></div>
   <div class="modal-header"><h3 id="market-modal-title">New market</h3><button class="modal-close" onclick="closeModal('market-modal')">&#x2715;</button></div>
 
   <div class="mf-section-label">Basics</div>
