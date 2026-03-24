@@ -74,7 +74,7 @@ function makeSlug(n){return n.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-
 
 // ── AUTH ─────────────────────────────────────────────────────────
 var currentUser=null;
-function switchAuthTab(t){document.querySelectorAll('.auth-tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='register')));document.getElementById('auth-login').style.display=t==='login'?'block':'none';document.getElementById('auth-register').style.display=t==='register'?'block':'none';document.getElementById('auth-forgot').style.display=t==='forgot'?'block':'none';clearAuthMsg();}
+function switchAuthTab(t){document.querySelectorAll('.auth-tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='register')));document.getElementById('auth-login').style.display=t==='login'?'block':'none';document.getElementById('auth-register').style.display=t==='register'?'block':'none';document.getElementById('auth-forgot').style.display=t==='forgot'?'block':'none';clearAuthMsg();if(t==='register'&&window.turnstile){var el=document.getElementById('reg-turnstile');if(el&&!el.querySelector('iframe'))window.turnstile.render(el,{sitekey:'0x4AAAAAACvSECCEAevdD5i-',theme:'auto'});}}
 function showAuthError(m){var e=document.getElementById('auth-error');e.textContent=m;e.style.display='block';document.getElementById('auth-success').style.display='none';}
 function showAuthSuccess(m){var e=document.getElementById('auth-success');e.textContent=m;e.style.display='block';document.getElementById('auth-error').style.display='none';}
 function clearAuthMsg(){document.getElementById('auth-error').style.display='none';document.getElementById('auth-success').style.display='none';}
