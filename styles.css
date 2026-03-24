@@ -39,6 +39,9 @@ body.dark{--bg:#1c1c1a;--bg2:#131310;--bg3:#252520;--border:rgba(255,255,255,0.0
 .settings-menu button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 20px;background:none;border:none;cursor:pointer;font-size:14px;color:var(--text);text-align:left;gap:16px;transition:background 0.1s;font-family:inherit}
 .settings-menu button:hover{background:var(--bg3)}
 .settings-menu .sm-sep{border:none;border-top:1px solid var(--border);margin:4px 0}
+.blocked-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px;color:var(--text)}
+.blocked-row button{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text3);line-height:1;padding:0 4px}
+.blocked-row button:hover{color:var(--red)}
 .sm-badge{font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500;background:var(--green-bg);color:var(--green)}
 .sm-badge.off{background:var(--bg3);color:var(--text3)}
 

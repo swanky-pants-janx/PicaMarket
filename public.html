@@ -230,6 +230,13 @@ async function submitVendorForm() {
     return;
   }
 
+  var blockedEmails=(coordinator.settings&&coordinator.settings.blocked_emails)||[];
+  if(blockedEmails.includes(email.toLowerCase())){
+    btn.textContent='Submit application';btn.disabled=false;
+    document.getElementById('v-success').style.display='block';
+    return;
+  }
+
   var {error} = await _sb.from('vendors').insert({
     id: crypto.randomUUID(),
     user_id: coordinator.id,

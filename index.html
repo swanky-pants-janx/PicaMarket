@@ -196,6 +196,7 @@
     <button onclick="toggleHints()"><span>💡 Hints</span><span class="sm-badge" id="sm-hints-val">Shown</span></button>
     <button onclick="openPaymentSettings()"><span>&#128179; Payment settings</span></button>
     <button onclick="openEmailTemplates()"><span>&#9993; Email templates</span></button>
+    <button onclick="openBlockedVendors()"><span>&#128683; Blocked vendors</span></button>
     <hr class="sm-sep">
     <button onclick="copyVendorLink()"><span>&#128279; Copy vendor page link</span></button>
     <button onclick="openAccountSettings()"><span>&#128100; Account settings</span></button>
@@ -367,6 +368,17 @@
     <div style="font-size:11px;color:var(--text3);margin-top:4px">Sent when you send a payment reminder. Your text appears after "Hi {name}," and before the outstanding fees table.</div>
   </div>
   <div style="display:flex;gap:8px;margin-top:1.25rem"><button class="btn" style="flex:1" onclick="closeModal('email-templates-modal')">Cancel</button><button class="btn primary" style="flex:1;padding:12px" id="et-save-btn" onclick="saveEmailTemplates()">Save</button></div>
+</div></div>
+
+<div class="modal-overlay" id="blocked-vendors-modal"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-header"><h3>Blocked vendors</h3><button class="modal-close" onclick="closeModal('blocked-vendors-modal')">&#x2715;</button></div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:1.25rem">Vendors with a blocked email address will be silently prevented from appearing in your approval queue. They won't know they're blocked.</p>
+  <div style="display:flex;gap:8px;margin-bottom:1rem">
+    <input class="form-input" id="blocked-email-input" type="email" placeholder="vendor@email.com" style="flex:1" onkeydown="if(event.key==='Enter')addBlockedEmail()">
+    <button class="btn primary" onclick="addBlockedEmail()" style="white-space:nowrap">Block email</button>
+  </div>
+  <div id="blocked-list"></div>
+  <div style="margin-top:1.25rem"><button class="btn" style="width:100%" onclick="closeModal('blocked-vendors-modal')">Done</button></div>
 </div></div>
 
 <div class="modal-overlay" id="reset-password-modal"><div class="modal"><div class="modal-handle"></div>
