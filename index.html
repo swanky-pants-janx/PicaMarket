@@ -60,6 +60,12 @@
 <div id="dashboard" style="display:none">
   <nav class="nav">
     <span class="nav-brand" id="nav-brand">PicaMarket</span>
+    <div class="nav-bell-area">
+      <button class="nav-bell-btn" onclick="showPage('approval')" title="Vendor applications">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="nav-bell-badge" style="display:none">0</span>
+      </button>
+    </div>
     <div class="nav-tabs">
       <div class="nav-tab active" onclick="showPage('approval')">Vendor Approval</div>
       <div class="nav-tab" onclick="showPage('approved')">Approved Vendors</div>
@@ -72,6 +78,10 @@
       <button class="nav-logout nav-logout-btn" onclick="doLogout()">Log out</button>
     </div>
     <div class="nav-mobile-right">
+      <button class="nav-bell-btn" onclick="showPage('approval')" title="Vendor applications">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="nav-bell-badge" style="display:none">0</span>
+      </button>
       <button class="dark-toggle" onclick="openSettingsMenu(event)">&#9776;</button>
       <button class="nav-logout" onclick="doLogout()">Log out</button>
     </div>
