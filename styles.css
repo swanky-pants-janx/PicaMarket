@@ -47,10 +47,10 @@ body.dark{--bg:#1c1c1a;--bg2:#131310;--bg3:#252520;--border:rgba(255,255,255,0.0
 .settings-menu .sm-sep{border:none;border-top:1px solid var(--border);margin:4px 0}
 /* ── SETTINGS PAGE ─────────────────────────────────────────────── */
 .settings-layout{display:flex;gap:0;align-items:flex-start}
-.settings-nav{width:190px;min-width:190px;padding:0.25rem 0;flex-shrink:0}
+.settings-nav{width:190px;min-width:190px;padding:0.25rem 1rem 0.25rem 0;flex-shrink:0}
 .settings-nav-group{margin-bottom:1.25rem}
 .settings-nav-label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);padding:0 0.75rem 0.5rem;display:block}
-.settings-nav-item{display:block;width:100%;text-align:left;background:none;border:none;cursor:pointer;font-size:13px;color:var(--text2);padding:7px 0.75rem;border-radius:8px;font-family:inherit;transition:color 0.15s,background 0.15s}
+.settings-nav-item{display:block;width:100%;text-align:left;background:none;border:none;cursor:pointer;font-size:13px;color:var(--text2);padding:7px 0.75rem;border-radius:8px;font-family:inherit;transition:color 0.15s,background 0.15s;margin-bottom:2px}
 .settings-nav-item:hover{color:var(--text);background:var(--bg3)}
 .settings-nav-item.active{color:var(--text);background:var(--bg3);font-weight:500}
 .settings-body{flex:1;padding:0 0 1rem 2rem;border-left:1px solid var(--border);min-width:0}
