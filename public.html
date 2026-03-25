@@ -290,7 +290,8 @@ async function submitVendorForm() {
   });
 
   btn.textContent = 'Submit application'; btn.disabled = false;
-  if (!error && coordinator.coordinator_email) {
+  var notifyEnabled=!coordinator.settings||coordinator.settings.notify_on_apply!==false;
+  if (!error && coordinator.coordinator_email && notifyEnabled) {
     var mnames = selectedMarkets.map(function(mid){var m=markets.find(function(x){return x.id===mid;});return m?m.name:mid;}).join(', ');
     sendEmail(coordinator.coordinator_email,'New vendor application — '+name,'<p>A new vendor application has been submitted to <strong>'+esc(coordinator.market_name)+'</strong>.</p><p><strong>Stall name:</strong> '+esc(name)+'<br><strong>Email:</strong> '+esc(email)+'<br><strong>Markets:</strong> '+esc(mnames)+'<br><strong>Description:</strong> '+esc(desc)+'</p><p>Log in to your dashboard to review and approve.</p>');
   }

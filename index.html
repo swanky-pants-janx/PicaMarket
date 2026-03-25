@@ -113,7 +113,7 @@
       <div class="btn-row">
         <button class="btn" onclick="exportCSV('pending')">Export CSV</button>
         <button class="btn danger" onclick="disapproveSelected()">Remove</button>
-        <button class="btn primary" onclick="approveSelected()">Approve</button>
+        <button class="btn primary" onclick="approveSelected()">Review</button>
       </div>
     </div>
     <div class="metric-grid" style="grid-template-columns:1fr">
@@ -345,6 +345,10 @@
   <div class="form-group"><label class="form-label">Your name</label><input class="form-input" id="acc-name" type="text" placeholder="Your name"></div>
   <div class="form-group"><label class="form-label">Market name</label><input class="form-input" id="acc-market" type="text" disabled style="opacity:0.5;cursor:not-allowed"><div style="font-size:11px;color:var(--text3);margin-top:4px">&#9888; Cannot be changed — it's tied to your public vendor page URL.</div></div>
   <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="acc-email" type="text" disabled style="opacity:0.5;cursor:not-allowed"><div style="font-size:11px;color:var(--text3);margin-top:4px">To change your email, contact support.</div></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:0.5px solid var(--border);margin-bottom:1rem;cursor:pointer" onclick="toggleAccNotify()">
+    <div><div style="font-size:13px;font-weight:500;color:var(--text)">Application email notifications</div><div style="font-size:12px;color:var(--text2);margin-top:2px">Email me when a vendor submits a new application</div></div>
+    <span class="sm-badge" id="acc-notify-val">On</span>
+  </div>
   <div style="display:flex;gap:8px;margin-bottom:1rem"><button class="btn" style="flex:1" onclick="closeModal('account-modal')">Cancel</button><button class="btn primary" style="flex:1;padding:12px" id="acc-save-btn" onclick="saveAccountSettings()">Save</button></div>
   <hr style="border:none;border-top:0.5px solid var(--border);margin:0.75rem 0">
   <button class="btn" style="width:100%;font-size:13px" onclick="sendPasswordResetFromAccount()">&#128274; Change password</button>
