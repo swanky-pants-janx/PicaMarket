@@ -170,6 +170,10 @@ input[type=checkbox]{width:17px;height:17px;cursor:pointer;accent-color:var(--te
 textarea.form-input{min-height:80px;resize:vertical;font-size:15px}
 select.form-input{font-size:14px}
 .form-input::placeholder{color:var(--text3)}
+.pw-strength-wrap{margin-top:6px}
+.pw-strength-bar{height:4px;border-radius:2px;background:var(--bg3);overflow:hidden;margin-bottom:4px}
+.pw-strength-fill{height:100%;width:0;border-radius:2px;transition:width 0.25s,background 0.25s}
+.pw-strength-label{font-size:11px;color:var(--text3)}
 
 /* ── MARKET CARDS ──────────────────────────────────────────────── */
 .market-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1rem;transition:box-shadow 0.15s}
