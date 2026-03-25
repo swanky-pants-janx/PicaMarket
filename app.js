@@ -135,6 +135,7 @@ async function saveAccountSettings(){var name=document.getElementById('acc-name'
 function sendPasswordResetFromAccount(){_sb.auth.resetPasswordForEmail(currentUser.email,{redirectTo:'https://picamarket.site/'});closeModal('account-modal');showToast('Password reset email sent!');}
 function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 function uid(){return crypto.randomUUID();}
+function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function makeSlug(n){var s=n.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-');return s||Math.random().toString(36).slice(2,10);}
 
