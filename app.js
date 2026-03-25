@@ -25,17 +25,7 @@ function pfUrl(vendor,market){
   q.set('signature',data.signature);
   return'https://www.payfast.co.za/eng/process?'+q.toString();
 }
-async function openPaymentSettings(){
-  document.getElementById('pf-merchant-id').value=currentUser.payfastMerchantId||'';
-  document.getElementById('pf-merchant-key').value=currentUser.payfastMerchantKey||'';
-  document.getElementById('bank-holder').value=currentUser.bankHolder||'';
-  document.getElementById('bank-name').value=currentUser.bankName||'';
-  document.getElementById('bank-acc-num').value=currentUser.bankAccNum||'';
-  document.getElementById('bank-branch').value=currentUser.bankBranch||'';
-  document.getElementById('bank-acc-type').value=currentUser.bankAccType||'';
-  document.getElementById('payment-settings-modal').classList.add('open');
-  closeSettingsMenu();
-}
+async function openPaymentSettings(){showPage('settings');showSettingsSec('payment');}
 async function savePaymentSettings(){
   var mid=document.getElementById('pf-merchant-id').value.trim();
   var mkey=document.getElementById('pf-merchant-key').value.trim();
@@ -58,16 +48,16 @@ async function savePaymentSettings(){
 // ── HELPERS ──────────────────────────────────────────────────────
 var darkMode=false;
 function saveUserSettings(){if(!currentUser)return;_sb.from('profiles').update({settings:{dark_mode:darkMode,hide_hints:state.hideHints,approval_email_intro:currentUser.emailApprovalIntro||null,reminder_email_intro:currentUser.emailReminderIntro||null,blocked_emails:currentUser.blockedEmails||[],form_fields:currentUser.formFields||DEFAULT_FORM_FIELDS,notify_on_apply:currentUser.notifyOnApply!==false}}).eq('id',currentUser.id).then(({error})=>{if(error)console.error('Settings save error:',error);});}
-function openBlockedVendors(){renderBlockedList();document.getElementById('blocked-vendors-modal').classList.add('open');closeSettingsMenu();}
+function openBlockedVendors(){showPage('settings');showSettingsSec('blocked');}
 function renderBlockedList(){var list=currentUser.blockedEmails||[];var el=document.getElementById('blocked-list');el.innerHTML=list.length?list.map(e=>'<div class="blocked-row"><span>'+esc(e)+'</span><button onclick="removeBlockedEmail(\''+esc(e)+'\')" title="Remove">&times;</button></div>').join(''):'<div style="font-size:13px;color:var(--text3);padding:8px 0">No blocked emails yet.</div>';}
 function addBlockedEmail(){var inp=document.getElementById('blocked-email-input');var email=inp.value.trim().toLowerCase();if(!email||!email.includes('@')){showToast('Enter a valid email');return;}if((currentUser.blockedEmails||[]).includes(email)){showToast('Already blocked');return;}currentUser.blockedEmails=[...(currentUser.blockedEmails||[]),email];inp.value='';saveUserSettings();renderBlockedList();showToast(email+' blocked');}
 function removeBlockedEmail(email){currentUser.blockedEmails=(currentUser.blockedEmails||[]).filter(e=>e!==email);saveUserSettings();renderBlockedList();showToast('Removed');}
-function openEmailTemplates(){document.getElementById('et-approval').value=currentUser.emailApprovalIntro||'';document.getElementById('et-reminder').value=currentUser.emailReminderIntro||'';document.getElementById('email-templates-modal').classList.add('open');closeSettingsMenu();}
+function openEmailTemplates(){showPage('settings');showSettingsSec('email');}
 async function saveEmailTemplates(){var approval=document.getElementById('et-approval').value.trim();var reminder=document.getElementById('et-reminder').value.trim();var btn=document.getElementById('et-save-btn');btn.textContent='Saving...';btn.disabled=true;currentUser.emailApprovalIntro=approval||null;currentUser.emailReminderIntro=reminder||null;saveUserSettings();btn.textContent='Save';btn.disabled=false;closeModal('email-templates-modal');showToast('Email templates saved');}
 function toggleDark(){darkMode=!darkMode;document.body.classList.toggle('dark',darkMode);syncSettingsMenu();saveUserSettings();}
 function openSettingsMenu(e){if(e)e.stopPropagation();showPage('settings');}
 function closeSettingsMenu(){document.getElementById('settings-overlay').classList.remove('open');}
-function syncSettingsMenu(){var dv=document.getElementById('sm-dark-val');if(dv){dv.textContent=darkMode?'On':'Off';dv.className=darkMode?'sm-badge':'sm-badge off';}var hv=document.getElementById('sm-hints-val');if(hv){hv.textContent=state.hideHints?'Hidden':'Shown';hv.className=state.hideHints?'sm-badge off':'sm-badge';}var sdv=document.getElementById('sp-dark-val');if(sdv){sdv.textContent=darkMode?'On':'Off';sdv.className=darkMode?'sm-badge':'sm-badge off';}var shv=document.getElementById('sp-hints-val');if(shv){shv.textContent=state.hideHints?'Hidden':'Shown';shv.className=state.hideHints?'sm-badge off':'sm-badge';}}
+function syncSettingsMenu(){var dv=document.getElementById('sm-dark-val');if(dv){dv.textContent=darkMode?'On':'Off';dv.className=darkMode?'sm-badge':'sm-badge off';}var hv=document.getElementById('sm-hints-val');if(hv){hv.textContent=state.hideHints?'Hidden':'Shown';hv.className=state.hideHints?'sm-badge off':'sm-badge';}var sdv=document.getElementById('sp-dark-val');if(sdv){sdv.textContent=darkMode?'On':'Off';sdv.className=darkMode?'sm-badge':'sm-badge off';}var shv=document.getElementById('sp-hints-val');if(shv){shv.textContent=state.hideHints?'Hidden':'Shown';shv.className=state.hideHints?'sm-badge off':'sm-badge';}if(currentUser){var an=document.getElementById('acc-name');if(an)an.value=currentUser.name||'';var am=document.getElementById('acc-market');if(am)am.value=currentUser.market||'';var ae=document.getElementById('acc-email');if(ae)ae.value=currentUser.email||'';var nv=document.getElementById('acc-notify-val');if(nv){var on=currentUser.notifyOnApply!==false;nv.textContent=on?'On':'Off';nv.className=on?'sm-badge':'sm-badge off';}var pm=document.getElementById('pf-merchant-id');if(pm)pm.value=currentUser.payfastMerchantId||'';var pk=document.getElementById('pf-merchant-key');if(pk)pk.value=currentUser.payfastMerchantKey||'';var bh=document.getElementById('bank-holder');if(bh)bh.value=currentUser.bankHolder||'';var bn2=document.getElementById('bank-name');if(bn2)bn2.value=currentUser.bankName||'';var ba=document.getElementById('bank-acc-num');if(ba)ba.value=currentUser.bankAccNum||'';var bb=document.getElementById('bank-branch');if(bb)bb.value=currentUser.bankBranch||'';var bt=document.getElementById('bank-acc-type');if(bt)bt.value=currentUser.bankAccType||'';var ea=document.getElementById('et-approval');if(ea)ea.value=currentUser.emailApprovalIntro||'';var er=document.getElementById('et-reminder');if(er)er.value=currentUser.emailReminderIntro||'';renderBlockedList();}}
 function showSettingsSec(sec){document.querySelectorAll('.settings-sec').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.settings-nav-item').forEach(el=>el.classList.remove('active'));var el=document.getElementById('ssec-'+sec);if(el)el.classList.add('active');var nav=document.getElementById('snav-'+sec);if(nav)nav.classList.add('active');}
 function toggleHints(){state.hideHints=!state.hideHints;document.querySelectorAll('.page-banner').forEach(el=>el.style.display=state.hideHints?'none':'');syncSettingsMenu();saveUserSettings();}
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
@@ -130,14 +120,14 @@ function _renderFormFieldsInto(container,fields,preview){
 }
 
 function copyVendorLink(){var url=window.location.origin+'/public.html?slug='+currentUser.slug;navigator.clipboard.writeText(url).then(()=>showToast('Vendor page link copied!')).catch(()=>alert('Your link:\n'+url));closeSettingsMenu();}
-async function openAccountSettings(){document.getElementById('acc-name').value=currentUser.name||'';document.getElementById('acc-market').value=currentUser.market||'';document.getElementById('acc-email').value=currentUser.email||'';var nv=document.getElementById('acc-notify-val');if(nv){var on=currentUser.notifyOnApply!==false;nv.textContent=on?'On':'Off';nv.className=on?'sm-badge':'sm-badge off';}document.getElementById('account-modal').classList.add('open');closeSettingsMenu();}
+async function openAccountSettings(){showPage('settings');showSettingsSec('account');}
 function toggleAccNotify(){var el=document.getElementById('acc-notify-val');var on=el.textContent==='On';el.textContent=on?'Off':'On';el.className=on?'sm-badge off':'sm-badge';}
 async function saveAccountSettings(){var name=document.getElementById('acc-name').value.trim();if(!name){alert('Name cannot be empty.');return;}var btn=document.getElementById('acc-save-btn');btn.textContent='Saving...';btn.disabled=true;var{error}=await _sb.from('profiles').update({coordinator_name:name}).eq('id',currentUser.id);btn.textContent='Save';btn.disabled=false;if(error){alert('Failed to save. Try again.');return;}currentUser.name=name;document.getElementById('nav-user').textContent=name;var nv=document.getElementById('acc-notify-val');if(nv)currentUser.notifyOnApply=nv.textContent==='On';saveUserSettings();closeModal('account-modal');showToast('Account settings saved!');}
-function sendPasswordResetFromAccount(){_sb.auth.resetPasswordForEmail(currentUser.email,{redirectTo:'https://picamarket.site/'});closeModal('account-modal');showToast('Password reset email sent!');}
+function sendPasswordResetFromAccount(){_sb.auth.resetPasswordForEmail(currentUser.email,{redirectTo:'https://picamarket.site/'});showToast('Password reset email sent!');}
 function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 function uid(){return crypto.randomUUID();}
 function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
+function closeModal(id){var el=document.getElementById(id);if(el)el.classList.remove('open');}
 function makeSlug(n){var s=n.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-');return s||Math.random().toString(36).slice(2,10);}
 
 // ── AUTH ─────────────────────────────────────────────────────────

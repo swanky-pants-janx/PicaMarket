@@ -278,25 +278,53 @@
         <div class="settings-sec" id="ssec-payment">
           <h3 class="settings-sec-title">Payment settings</h3>
           <p class="settings-sec-desc">Configure your PayFast integration and bank details used for vendor payment links and EFT payments</p>
-          <button class="btn" onclick="openPaymentSettings()">Edit payment settings</button>
+          <div class="mf-section-label" style="margin-top:0">PayFast</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Vendors receive a PayFast payment link in their approval email. Money goes directly into your PayFast account.</p>
+          <div class="form-group"><label class="form-label">Merchant ID</label><input class="form-input" id="pf-merchant-id" type="text" placeholder="e.g. 10011914"><div style="font-size:11px;color:var(--text3);margin-top:4px">Found in your PayFast dashboard under Settings → Merchant Details</div></div>
+          <div class="form-group"><label class="form-label">Merchant Key</label><input class="form-input" id="pf-merchant-key" type="text" placeholder="e.g. q1cd2rdny4a53"><div style="font-size:11px;color:var(--text3);margin-top:4px">Found next to your Merchant ID in PayFast</div></div>
+          <div class="mf-section-label">EFT / Bank transfer</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">If filled in, vendors will also see your banking details in payment reminder emails as an alternative to PayFast.</p>
+          <div class="form-group"><label class="form-label">Account holder</label><input class="form-input" id="bank-holder" type="text" placeholder="e.g. Jane Smith"></div>
+          <div class="form-group"><label class="form-label">Bank name</label><input class="form-input" id="bank-name" type="text" placeholder="e.g. FNB, Capitec, Nedbank"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group"><label class="form-label">Account number</label><input class="form-input" id="bank-acc-num" type="text" placeholder="e.g. 62012345678"></div>
+            <div class="form-group"><label class="form-label">Branch code</label><input class="form-input" id="bank-branch" type="text" placeholder="e.g. 250655"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Account type</label><select class="form-input" id="bank-acc-type"><option value="">Select...</option><option value="Cheque">Cheque / Current</option><option value="Savings">Savings</option></select></div>
+          <button class="btn primary" id="pf-save-btn" onclick="savePaymentSettings()">Save payment settings</button>
         </div>
         <div class="settings-sec" id="ssec-email">
           <h3 class="settings-sec-title">Email templates</h3>
-          <p class="settings-sec-desc">Customise the intro text sent in vendor approval and payment reminder emails</p>
-          <button class="btn" onclick="openEmailTemplates()">Edit email templates</button>
+          <p class="settings-sec-desc">Customise the opening message of your vendor emails. Payment details (PayFast links, EFT info) are added automatically below your text.</p>
+          <div class="form-group"><label class="form-label">Approval email — opening message</label><textarea class="form-input" id="et-approval" rows="5" placeholder="e.g. Great news! Your vendor application has been approved for the following market(s):&#10;&#10;Leave blank to use the default message." style="resize:vertical;min-height:100px"></textarea><div style="font-size:11px;color:var(--text3);margin-top:4px">Sent when you approve a vendor. Your text appears after "Hi {name}," and before the market name and payment details.</div></div>
+          <div class="form-group" style="margin-top:1rem"><label class="form-label">Payment reminder — opening message</label><textarea class="form-input" id="et-reminder" rows="5" placeholder="e.g. This is a friendly reminder that you have outstanding stall fees.&#10;&#10;Leave blank to use the default message." style="resize:vertical;min-height:100px"></textarea><div style="font-size:11px;color:var(--text3);margin-top:4px">Sent when you send a payment reminder. Your text appears after "Hi {name}," and before the outstanding fees table.</div></div>
+          <button class="btn primary" id="et-save-btn" onclick="saveEmailTemplates()" style="margin-top:0.75rem">Save email templates</button>
         </div>
         <div class="settings-sec" id="ssec-blocked">
           <h3 class="settings-sec-title">Blocked vendors</h3>
-          <p class="settings-sec-desc">Manage the list of email addresses that are prevented from submitting vendor applications to your market</p>
-          <button class="btn" onclick="openBlockedVendors()">Manage blocked vendors</button>
+          <p class="settings-sec-desc">Vendors with a blocked email address will be silently prevented from appearing in your approval queue. They won't know they're blocked.</p>
+          <div style="display:flex;gap:8px;margin-bottom:1rem">
+            <input class="form-input" id="blocked-email-input" type="email" placeholder="vendor@email.com" style="flex:1;max-width:340px" onkeydown="if(event.key==='Enter')addBlockedEmail()">
+            <button class="btn primary" onclick="addBlockedEmail()" style="white-space:nowrap">Block email</button>
+          </div>
+          <div id="blocked-list"></div>
         </div>
         <div class="settings-sec" id="ssec-account">
           <h3 class="settings-sec-title">Account settings</h3>
-          <p class="settings-sec-desc">Update your name, market name, email notification preferences, and password. Use the link below to share your vendor application page</p>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn" onclick="openAccountSettings()">Edit account settings</button>
+          <p class="settings-sec-desc">Update your name, email notification preferences, and password. Use the link below to share your vendor application page.</p>
+          <div class="form-group"><label class="form-label">Your name</label><input class="form-input" id="acc-name" type="text" placeholder="Your name"></div>
+          <div class="form-group"><label class="form-label">Market name</label><input class="form-input" id="acc-market" type="text" disabled style="opacity:0.5;cursor:not-allowed"><div style="font-size:11px;color:var(--text3);margin-top:4px">&#9888; Cannot be changed — it's tied to your public vendor page URL.</div></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="acc-email" type="text" disabled style="opacity:0.5;cursor:not-allowed"><div style="font-size:11px;color:var(--text3);margin-top:4px">To change your email, contact support.</div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:0.5px solid var(--border);margin-bottom:1.25rem;cursor:pointer" onclick="toggleAccNotify()">
+            <div><div style="font-size:13px;font-weight:500;color:var(--text)">Application email notifications</div><div style="font-size:12px;color:var(--text2);margin-top:2px">Email me when a vendor submits a new application</div></div>
+            <span class="sm-badge" id="acc-notify-val">On</span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem">
+            <button class="btn primary" id="acc-save-btn" onclick="saveAccountSettings()">Save</button>
             <button class="btn" onclick="copyVendorLink()">&#128279; Copy vendor page link</button>
           </div>
+          <hr style="border:none;border-top:0.5px solid var(--border);margin-bottom:1.25rem">
+          <button class="btn" style="font-size:13px" onclick="sendPasswordResetFromAccount()">&#128274; Change password</button>
         </div>
       </div>
     </div>
@@ -438,69 +466,6 @@
   <div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="closeModal('notes-modal')">Cancel</button><button class="btn primary" style="flex:1" onclick="saveNotes()">Save notes</button></div>
 </div></div>
 
-<div class="modal-overlay" id="account-modal"><div class="modal"><div class="modal-handle"></div>
-  <div class="modal-header"><h3>Account settings</h3><button class="modal-close" onclick="closeModal('account-modal')">&#x2715;</button></div>
-  <div class="form-group"><label class="form-label">Your name</label><input class="form-input" id="acc-name" type="text" placeholder="Your name"></div>
-  <div class="form-group"><label class="form-label">Market name</label><input class="form-input" id="acc-market" type="text" disabled style="opacity:0.5;cursor:not-allowed"><div style="font-size:11px;color:var(--text3);margin-top:4px">&#9888; Cannot be changed — it's tied to your public vendor page URL.</div></div>
-  <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="acc-email" type="text" disabled style="opacity:0.5;cursor:not-allowed"><div style="font-size:11px;color:var(--text3);margin-top:4px">To change your email, contact support.</div></div>
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:0.5px solid var(--border);margin-bottom:1rem;cursor:pointer" onclick="toggleAccNotify()">
-    <div><div style="font-size:13px;font-weight:500;color:var(--text)">Application email notifications</div><div style="font-size:12px;color:var(--text2);margin-top:2px">Email me when a vendor submits a new application</div></div>
-    <span class="sm-badge" id="acc-notify-val">On</span>
-  </div>
-  <div style="display:flex;gap:8px;margin-bottom:1rem"><button class="btn" style="flex:1" onclick="closeModal('account-modal')">Cancel</button><button class="btn primary" style="flex:1;padding:12px" id="acc-save-btn" onclick="saveAccountSettings()">Save</button></div>
-  <hr style="border:none;border-top:0.5px solid var(--border);margin:0.75rem 0">
-  <button class="btn" style="width:100%;font-size:13px" onclick="sendPasswordResetFromAccount()">&#128274; Change password</button>
-</div></div>
-
-<div class="modal-overlay" id="payment-settings-modal"><div class="modal"><div class="modal-handle"></div>
-  <div class="modal-header"><h3>Payment settings</h3><button class="modal-close" onclick="closeModal('payment-settings-modal')">&#x2715;</button></div>
-
-  <div class="mf-section-label" style="margin-top:0.25rem">PayFast</div>
-  <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Vendors receive a PayFast payment link in their approval email. Money goes directly into your PayFast account.</p>
-  <div class="form-group"><label class="form-label">Merchant ID</label><input class="form-input" id="pf-merchant-id" type="text" placeholder="e.g. 10011914"><div style="font-size:11px;color:var(--text3);margin-top:4px">Found in your PayFast dashboard under Settings → Merchant Details</div></div>
-  <div class="form-group"><label class="form-label">Merchant Key</label><input class="form-input" id="pf-merchant-key" type="text" placeholder="e.g. q1cd2rdny4a53"><div style="font-size:11px;color:var(--text3);margin-top:4px">Found next to your Merchant ID in PayFast</div></div>
-
-  <div class="mf-section-label">EFT / Bank transfer</div>
-  <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">If filled in, vendors will also see your banking details in payment reminder emails as an alternative to PayFast.</p>
-  <div class="form-group"><label class="form-label">Account holder</label><input class="form-input" id="bank-holder" type="text" placeholder="e.g. Jane Smith"></div>
-  <div class="form-group"><label class="form-label">Bank name</label><input class="form-input" id="bank-name" type="text" placeholder="e.g. FNB, Capitec, Nedbank"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-    <div class="form-group"><label class="form-label">Account number</label><input class="form-input" id="bank-acc-num" type="text" placeholder="e.g. 62012345678"></div>
-    <div class="form-group"><label class="form-label">Branch code</label><input class="form-input" id="bank-branch" type="text" placeholder="e.g. 250655"></div>
-  </div>
-  <div class="form-group"><label class="form-label">Account type</label>
-    <select class="form-input" id="bank-acc-type"><option value="">Select...</option><option value="Cheque">Cheque / Current</option><option value="Savings">Savings</option></select>
-  </div>
-
-  <div style="display:flex;gap:8px;margin-top:0.5rem"><button class="btn" style="flex:1" onclick="closeModal('payment-settings-modal')">Cancel</button><button class="btn primary" style="flex:1;padding:12px" id="pf-save-btn" onclick="savePaymentSettings()">Save</button></div>
-</div></div>
-
-<div class="modal-overlay" id="email-templates-modal"><div class="modal"><div class="modal-handle"></div>
-  <div class="modal-header"><h3>Email templates</h3><button class="modal-close" onclick="closeModal('email-templates-modal')">&#x2715;</button></div>
-  <p style="font-size:13px;color:var(--text2);margin-bottom:1.25rem">Customise the opening message of your vendor emails. Payment details (PayFast links, EFT info) are added automatically below your text.</p>
-  <div class="form-group">
-    <label class="form-label">Approval email — opening message</label>
-    <textarea class="form-input" id="et-approval" rows="5" placeholder="e.g. Great news! Your vendor application has been approved for the following market(s):&#10;&#10;Leave blank to use the default message." style="resize:vertical;min-height:100px"></textarea>
-    <div style="font-size:11px;color:var(--text3);margin-top:4px">Sent when you approve a vendor. Your text appears after "Hi {name}," and before the market name and payment details.</div>
-  </div>
-  <div class="form-group" style="margin-top:1rem">
-    <label class="form-label">Payment reminder — opening message</label>
-    <textarea class="form-input" id="et-reminder" rows="5" placeholder="e.g. This is a friendly reminder that you have outstanding stall fees.&#10;&#10;Leave blank to use the default message." style="resize:vertical;min-height:100px"></textarea>
-    <div style="font-size:11px;color:var(--text3);margin-top:4px">Sent when you send a payment reminder. Your text appears after "Hi {name}," and before the outstanding fees table.</div>
-  </div>
-  <div style="display:flex;gap:8px;margin-top:1.25rem"><button class="btn" style="flex:1" onclick="closeModal('email-templates-modal')">Cancel</button><button class="btn primary" style="flex:1;padding:12px" id="et-save-btn" onclick="saveEmailTemplates()">Save</button></div>
-</div></div>
-
-<div class="modal-overlay" id="blocked-vendors-modal"><div class="modal"><div class="modal-handle"></div>
-  <div class="modal-header"><h3>Blocked vendors</h3><button class="modal-close" onclick="closeModal('blocked-vendors-modal')">&#x2715;</button></div>
-  <p style="font-size:13px;color:var(--text2);margin-bottom:1.25rem">Vendors with a blocked email address will be silently prevented from appearing in your approval queue. They won't know they're blocked.</p>
-  <div style="display:flex;gap:8px;margin-bottom:1rem">
-    <input class="form-input" id="blocked-email-input" type="email" placeholder="vendor@email.com" style="flex:1" onkeydown="if(event.key==='Enter')addBlockedEmail()">
-    <button class="btn primary" onclick="addBlockedEmail()" style="white-space:nowrap">Block email</button>
-  </div>
-  <div id="blocked-list"></div>
-  <div style="margin-top:1.25rem"><button class="btn" style="width:100%" onclick="closeModal('blocked-vendors-modal')">Done</button></div>
-</div></div>
 
 <div class="modal-overlay" id="field-modal"><div class="modal"><div class="modal-handle"></div>
   <div class="modal-header"><h3 id="field-modal-title">Add field</h3><button class="modal-close" onclick="closeModal('field-modal')">&#x2715;</button></div>
