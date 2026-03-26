@@ -175,6 +175,7 @@
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px" class="page-actions">
       <h2 style="margin:0">Approved Vendors</h2>
       <div style="display:flex;gap:8px">
+        <button class="btn" onclick="openMassActionApproved(event)">&#9783; Mass actions</button>
         <button class="btn" onclick="sendBulkPaymentReminders()">&#9993; Send reminders</button>
         <button class="btn" onclick="exportCSV('approved')">Export CSV</button>
       </div>
@@ -187,6 +188,7 @@
     </div>
     <div class="card">
       <div class="toolbar">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;color:var(--text);flex-shrink:0"><input type="checkbox" id="va-check-all" onchange="toggleAllApproved(this)"> Select all</label>
         <input class="search-input" type="text" placeholder="Search vendors..." oninput="renderApproved(this.value,state.filterPayment)">
         <select class="form-input" style="width:auto;padding:8px 12px;font-size:13px" onchange="state.filterPayment=this.value;renderApproved('',this.value)">
           <option value="">All statuses</option><option value="outstanding">Outstanding</option><option value="paid">Paid</option>
@@ -392,6 +394,16 @@
   <button onclick="dotMenuAction('remove')" class="danger">&#128465; Remove vendor</button>
 </div>
 
+<!-- MASS ACTION MENU (APPROVED) -->
+<div class="dot-menu-popup" id="mass-action-approved-menu">
+  <div class="dm-label" id="mass-action-approved-label"></div>
+  <button onclick="massActionApproved('addmarket')">&#43; Add to market</button>
+  <button onclick="massActionApproved('credit')">&#8631; Credit to another market</button>
+  <button onclick="massActionApproved('pay')">&#128179; Update payment</button>
+  <button onclick="massActionApproved('reminder')">&#9993; Send payment reminders</button>
+  <button onclick="massActionApproved('remove')" class="danger">&#128465; Remove vendors</button>
+</div>
+
 <!-- MODALS -->
 <div class="modal-overlay" id="remove-modal"><div class="modal"><div class="modal-handle"></div>
   <div class="modal-header"><h3>Remove applicants?</h3><button class="modal-close" onclick="closeModal('remove-modal')">&#x2715;</button></div>
@@ -416,7 +428,7 @@
 
 <!-- PAY MODAL: step 1 = pick market, step 2 = pick method -->
 <div class="modal-overlay" id="pay-modal"><div class="modal"><div class="modal-handle"></div>
-  <div class="modal-header"><h3>Update payment — <span id="pay-modal-name"></span></h3><button class="modal-close" onclick="closeModal('pay-modal')">&#x2715;</button></div>
+  <div class="modal-header"><h3>Update payment — <span id="pay-modal-name"></span></h3><button class="modal-close" onclick="state._massVendorIds=null;closeModal('pay-modal')">&#x2715;</button></div>
   <div id="pay-step-1">
     <div class="form-group">
       <label class="form-label">Select market *</label>
@@ -426,7 +438,7 @@
     </div>
     <div id="pay-step-1-info" class="info-box blue"></div>
     <div style="display:flex;gap:8px">
-      <button class="btn" style="flex:1" onclick="closeModal('pay-modal')">Cancel</button>
+      <button class="btn" style="flex:1" onclick="state._massVendorIds=null;closeModal('pay-modal')">Cancel</button>
       <button class="btn primary" style="flex:1" onclick="payStep2()">Next</button>
     </div>
   </div>
@@ -452,20 +464,28 @@
   <div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="closeModal('remove-approved-modal')">Cancel</button><button class="btn danger" style="flex:1" onclick="confirmRemoveApproved()">Yes, remove</button></div>
 </div></div>
 
+<div class="modal-overlay" id="mass-remove-approved-modal"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-header"><h3>Remove vendors?</h3><button class="modal-close" onclick="closeModal('mass-remove-approved-modal')">&#x2715;</button></div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:0.75rem">You are about to permanently remove the following vendors from the approved list:</p>
+  <ul id="mass-remove-approved-list" style="font-size:13px;margin:0 0 0.75rem 1.25rem;padding:0;max-height:200px;overflow-y:auto"></ul>
+  <p style="font-size:13px;color:var(--red);margin-bottom:1.25rem">This action cannot be undone.</p>
+  <div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="closeModal('mass-remove-approved-modal')">Cancel</button><button class="btn danger" style="flex:1" onclick="confirmMassRemoveApproved()">Yes, remove all</button></div>
+</div></div>
+
 <div class="modal-overlay" id="add-market-modal"><div class="modal"><div class="modal-handle"></div>
-  <div class="modal-header"><h3>Add to market — <span id="add-market-vendor-name"></span></h3><button class="modal-close" onclick="closeModal('add-market-modal')">&#x2715;</button></div>
+  <div class="modal-header"><h3>Add to market — <span id="add-market-vendor-name"></span></h3><button class="modal-close" onclick="state._massVendorIds=null;closeModal('add-market-modal')">&#x2715;</button></div>
   <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Select a market to add this vendor to. Their stall fee total will update automatically.</p>
   <div class="form-group"><label class="form-label">Select market *</label><select class="form-input" id="add-market-select" onchange="onAddMarketChange()"><option value="">Select a market...</option></select></div>
   <div class="info-box blue" id="add-market-info"></div>
-  <div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="closeModal('add-market-modal')">Cancel</button><button class="btn primary" style="flex:1" onclick="confirmAddMarket()">Add to market</button></div>
+  <div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="state._massVendorIds=null;closeModal('add-market-modal')">Cancel</button><button class="btn primary" style="flex:1" onclick="confirmAddMarket()">Add to market</button></div>
 </div></div>
 
 <div class="modal-overlay" id="credit-modal"><div class="modal"><div class="modal-handle"></div>
-  <div class="modal-header"><h3>Credit vendor — <span id="credit-vendor-name"></span></h3><button class="modal-close" onclick="closeModal('credit-modal')">&#x2715;</button></div>
+  <div class="modal-header"><h3>Credit vendor — <span id="credit-vendor-name"></span></h3><button class="modal-close" onclick="state._massVendorIds=null;closeModal('credit-modal')">&#x2715;</button></div>
   <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">This vendor will be removed from their current markets and credited to the selected one. Their payment status carries over.</p>
   <div class="form-group"><label class="form-label">Credit to market *</label><select class="form-input" id="credit-market-select" onchange="onCreditMarketChange()"><option value="">Select a market...</option></select></div>
   <div class="info-box blue" id="credit-info"></div>
-  <div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="closeModal('credit-modal')">Cancel</button><button class="btn primary" style="flex:1" onclick="confirmCredit()">Confirm credit</button></div>
+  <div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="state._massVendorIds=null;closeModal('credit-modal')">Cancel</button><button class="btn primary" style="flex:1" onclick="confirmCredit()">Confirm credit</button></div>
 </div></div>
 
 

@@ -303,7 +303,7 @@ function renderApproved(filter,payFilter){
   if(as.col){list.sort((a,b)=>{var av,bv;if(as.col==='name'){av=a.name.toLowerCase();bv=b.name.toLowerCase();}else if(as.col==='markets'){av=a.markets.length;bv=b.markets.length;}else if(as.col==='fee'){av=a.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+getStallFee(a,m);},0);bv=b.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+getStallFee(b,m);},0);}else if(as.col==='payment'){var ord={paid:0,partial:1,outstanding:2};av=ord[calcPayStatus(a)]||0;bv=ord[calcPayStatus(b)]||0;}return av<bv?-as.dir:av>bv?as.dir:0;});}
   var tb=document.getElementById('approved-tbody'),cards=document.getElementById('approved-cards'),empty=document.getElementById('approved-empty');
   var _ash=function(label,col){var arr=as.col===col?(as.dir===1?' ▲':' ▼'):'';return'<th style="cursor:pointer;user-select:none;white-space:nowrap" onclick="sortApproved(\''+col+'\')">'+label+'<span style="font-size:10px;color:var(--text3)">'+arr+'</span></th>';};
-  document.getElementById('approved-thead').innerHTML='<tr>'+_ash('Stall name','name')+_ash('Markets','markets')+_ash('Total fee','fee')+_ash('Payment','payment')+'<th>Method</th><th></th></tr>';
+  document.getElementById('approved-thead').innerHTML='<tr><th style="width:36px"></th>'+_ash('Stall name','name')+_ash('Markets','markets')+_ash('Total fee','fee')+_ash('Payment','payment')+'<th>Method</th><th></th></tr>';
   if(!list.length){tb.innerHTML='';cards.innerHTML='';empty.style.display='block';updateMetrics();return;}
   empty.style.display='none';
   tb.innerHTML=list.map(v=>{
@@ -313,17 +313,17 @@ function renderApproved(filter,payFilter){
     var pb=ps==='paid'?'<span class="badge paid">Paid</span>':ps==='partial'?'<span class="badge partial">Partial</span>':'<span class="badge outstanding">Outstanding</span>';
     var method='<span style="color:var(--text3);font-size:12px">—</span>';
     var exp=state.expandedRows['appr_'+v.id];
-    var rows='<tr><td><button class="vendor-name-btn" onclick="toggleExpandApproved(\''+v.id+'\')" style="font-weight:500">'+esc(v.name)+'</button><br><span style="font-size:11px;color:var(--text2)">'+esc(v.email)+'</span></td><td><div class="market-chips">'+(chips||'—')+'</div></td><td style="font-weight:500">R'+fee.toLocaleString()+'</td><td>'+pb+'</td><td>'+method+'</td><td><button onclick="openDotMenu(event,\''+v.id+'\')" style="background:none;border:0.5px solid var(--border);border-radius:6px;cursor:pointer;padding:4px 9px;font-size:16px;color:var(--text2);line-height:1">&#8942;</button></td></tr>';
+    var rows='<tr><td><input type="checkbox" class="va-check" value="'+v.id+'"></td><td><button class="vendor-name-btn" onclick="toggleExpandApproved(\''+v.id+'\')" style="font-weight:500">'+esc(v.name)+'</button><br><span style="font-size:11px;color:var(--text2)">'+esc(v.email)+'</span></td><td><div class="market-chips">'+(chips||'—')+'</div></td><td style="font-weight:500">R'+fee.toLocaleString()+'</td><td>'+pb+'</td><td>'+method+'</td><td><button onclick="openDotMenu(event,\''+v.id+'\')" style="background:none;border:0.5px solid var(--border);border-radius:6px;cursor:pointer;padding:4px 9px;font-size:16px;color:var(--text2);line-height:1">&#8942;</button></td></tr>';
     if(exp){
       var apprPhotos=v.images&&v.images.length?'<div style="grid-column:1/-1"><div class="field-label">Stall photos</div><div class="img-thumb-grid" style="margin-top:4px">'+v.images.map((src,i)=>'<div class="img-thumb clickable" onclick="openLightbox(\''+v.id+'\','+i+')"><img src="'+src+'"></div>').join('')+'</div></div>':'';
-      rows+='<tr class="expand-row"><td colspan="6"><div class="expand-inner"><div style="grid-column:1/-1"><div class="field-label">Description</div><div class="field-value">'+esc(v.desc||'—')+'</div></div>'+_vendorCustomSection(v,true)+apprPhotos+'</div></td></tr>';
+      rows+='<tr class="expand-row"><td colspan="7"><div class="expand-inner"><div style="grid-column:1/-1"><div class="field-label">Description</div><div class="field-value">'+esc(v.desc||'—')+'</div></div>'+_vendorCustomSection(v,true)+apprPhotos+'</div></td></tr>';
       rows+=v.markets.map(mid=>{
         var m=state.markets.find(x=>x.id===mid);
         var mp=(v.marketPayments||{})[mid];
         var mm=(v.marketMethods||{})[mid];
         var mpb=mp==='paid'?'<span class="badge paid">Paid</span>':'<span class="badge outstanding">Outstanding</span>';
         var mmb=mm?'<span class="badge '+mm+'">'+mm.charAt(0).toUpperCase()+mm.slice(1)+'</span>':'<span style="color:var(--text3);font-size:12px">—</span>';
-        return'<tr style="background:var(--bg2)"><td colspan="2" style="padding:8px 12px 8px 28px;font-size:12px;color:var(--text2)">&#8627; '+(m?esc(m.name):mid)+' <span style="color:var(--text3)">('+stallTypeLabel(v,m)+')</span></td><td style="padding:8px 12px;font-size:12px;font-weight:500">R'+getStallFee(v,m)+'</td><td style="padding:8px 12px">'+mpb+'</td><td style="padding:8px 12px">'+mmb+'</td><td></td></tr>';
+        return'<tr style="background:var(--bg2)"><td></td><td colspan="2" style="padding:8px 12px 8px 28px;font-size:12px;color:var(--text2)">&#8627; '+(m?esc(m.name):mid)+' <span style="color:var(--text3)">('+stallTypeLabel(v,m)+')</span></td><td style="padding:8px 12px;font-size:12px;font-weight:500">R'+getStallFee(v,m)+'</td><td style="padding:8px 12px">'+mpb+'</td><td style="padding:8px 12px">'+mmb+'</td><td></td></tr>';
       }).join('');
     }
     return rows;
@@ -336,7 +336,7 @@ function renderApproved(filter,payFilter){
     var exp=state.expandedRows['appr_'+v.id];
     var apprPhotosM=v.images&&v.images.length?'<div class="field-label" style="margin-top:8px;margin-bottom:4px">Stall photos</div><div class="img-thumb-grid">'+v.images.map((src,i)=>'<div class="img-thumb clickable" onclick="openLightbox(\''+v.id+'\','+i+')"><img src="'+src+'"></div>').join('')+'</div>':'';
     var expandContent=exp?'<div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border)"><div class="field-label">Description</div><div class="field-value" style="margin-bottom:8px">'+esc(v.desc||'—')+'</div>'+_vendorCustomSection(v,false)+apprPhotosM+'<div class="field-label" style="margin-top:8px;margin-bottom:4px">Markets &amp; stall types</div>'+v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);var mp=(v.marketPayments||{})[mid];var mm=(v.marketMethods||{})[mid];var mpb=mp==='paid'?'<span class="badge paid">Paid</span>':'<span class="badge outstanding">Outstanding</span>';var mmb=mm?'<span class="badge '+mm+'">'+mm.charAt(0).toUpperCase()+mm.slice(1)+'</span>':'';return'<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--border)"><span style="font-size:12px;color:var(--text2)">'+(m?esc(m.name):mid)+' <span style="color:var(--text3)">('+stallTypeLabel(v,m)+')</span></span><div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;font-weight:500;color:var(--text)">R'+getStallFee(v,m)+'</span>'+mpb+mmb+'</div></div>';}).join('')+'</div>':'';
-    return'<div class="vendor-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div><button class="vendor-name-btn" onclick="toggleExpandApproved(\''+v.id+'\')" style="font-size:14px;font-weight:500">'+esc(v.name)+'</button><div style="font-size:11px;color:var(--text2)">'+esc(v.email)+'</div></div><div style="display:flex;align-items:center;gap:6px">'+pb+'<button onclick="openDotMenu(event,\''+v.id+'\')" style="background:none;border:0.5px solid var(--border);border-radius:6px;cursor:pointer;padding:4px 8px;font-size:16px;color:var(--text2);line-height:1">&#8942;</button></div></div><div class="market-chips" style="margin-bottom:8px">'+(chips||'—')+'</div><span style="font-size:13px;font-weight:500;color:var(--text)">R'+fee.toLocaleString()+'</span>'+expandContent+'</div>';
+    return'<div class="vendor-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="display:flex;align-items:center;gap:8px"><input type="checkbox" class="va-check" value="'+v.id+'"><div><button class="vendor-name-btn" onclick="toggleExpandApproved(\''+v.id+'\')" style="font-size:14px;font-weight:500">'+esc(v.name)+'</button><div style="font-size:11px;color:var(--text2)">'+esc(v.email)+'</div></div></div><div style="display:flex;align-items:center;gap:6px">'+pb+'<button onclick="openDotMenu(event,\''+v.id+'\')" style="background:none;border:0.5px solid var(--border);border-radius:6px;cursor:pointer;padding:4px 8px;font-size:16px;color:var(--text2);line-height:1">&#8942;</button></div></div><div class="market-chips" style="margin-bottom:8px">'+(chips||'—')+'</div><span style="font-size:13px;font-weight:500;color:var(--text)">R'+fee.toLocaleString()+'</span>'+expandContent+'</div>';
   }).join('');
   updateMetrics();
 }
@@ -361,7 +361,7 @@ function openDotMenu(e,vid){
   if(top+200>window.innerHeight)top=rect.top-210;
   menu.style.top=top+'px';menu.style.left=left+'px';
 }
-document.addEventListener('click',function(e){var dm=document.getElementById('dot-menu');if(dm&&dm.style.display==='block'&&!dm.contains(e.target))dm.style.display='none';});
+document.addEventListener('click',function(e){var dm=document.getElementById('dot-menu');if(dm&&dm.style.display==='block'&&!dm.contains(e.target))dm.style.display='none';var mm=document.getElementById('mass-action-approved-menu');if(mm&&mm.style.display==='block'&&!mm.contains(e.target))mm.style.display='none';});
 
 function dotMenuAction(action){
   document.getElementById('dot-menu').style.display='none';
@@ -453,22 +453,27 @@ function payBackStep1(){
   document.getElementById('pay-step-2').style.display='none';
 }
 function setPayment(method){
-  var v=state.vendors.find(x=>x.id===state._menuVendorId);
   var mid=state._payMarketId;
-  if(!v||!mid)return;
-  if(!v.marketPayments)v.marketPayments={};
-  if(!v.marketMethods)v.marketMethods={};
-  if(method==='outstanding'){
-    v.marketPayments[mid]='outstanding';
-    delete v.marketMethods[mid];
-  } else {
-    v.marketPayments[mid]='paid';
-    v.marketMethods[mid]=method;
-  }
-  var ps=calcPayStatus(v);
-  v.payStatus=ps;
-  v.payMethod=ps==='paid'?method:(ps==='partial'?'partial':null);
-  sbSave('vendors',vendorToDb(v));
+  if(!mid)return;
+  var ids=state._massVendorIds&&state._massVendorIds.length?state._massVendorIds:[state._menuVendorId];
+  ids.forEach(function(id){
+    var v=state.vendors.find(x=>x.id===id);
+    if(!v||!v.markets.includes(mid))return;
+    if(!v.marketPayments)v.marketPayments={};
+    if(!v.marketMethods)v.marketMethods={};
+    if(method==='outstanding'){
+      v.marketPayments[mid]='outstanding';
+      delete v.marketMethods[mid];
+    } else {
+      v.marketPayments[mid]='paid';
+      v.marketMethods[mid]=method;
+    }
+    var ps=calcPayStatus(v);
+    v.payStatus=ps;
+    v.payMethod=ps==='paid'?method:(ps==='partial'?'partial':null);
+    sbSave('vendors',vendorToDb(v));
+  });
+  state._massVendorIds=null;
   closeModal('pay-modal');
   renderApproved();
   updateMetrics();
@@ -476,10 +481,70 @@ function setPayment(method){
 
 // ── ADD / CREDIT / REMOVE ─────────────────────────────────────────
 function onAddMarketChange(){var mid=document.getElementById('add-market-select').value;var info=document.getElementById('add-market-info');if(!mid){info.style.display='none';return;}var m=state.markets.find(x=>x.id===mid);var v=state.vendors.find(x=>x.id===state._menuVendorId);if(m&&v){var nf=m.fee||FEE;var existingTotal=v.markets.reduce((t,mid2)=>{var mx=state.markets.find(x=>x.id===mid2);return t+getStallFee(v,mx);},0);info.style.display='block';info.textContent='Vendor will be added to "'+m.name+'" at normal stall rate (R'+nf+'). Total fee updates to R'+(existingTotal+nf).toLocaleString()+'.';};}
-function confirmAddMarket(){var mid=document.getElementById('add-market-select').value;if(!mid){alert('Please select a market.');return;}var v=state.vendors.find(x=>x.id===state._menuVendorId);if(!v)return;if(!v.markets.includes(mid)){v.markets.push(mid);if(!v.marketPayments)v.marketPayments={};v.marketPayments[mid]='outstanding';}sbSave('vendors',vendorToDb(v));closeModal('add-market-modal');renderApproved();updateMetrics();}
+function confirmAddMarket(){var mid=document.getElementById('add-market-select').value;if(!mid){alert('Please select a market.');return;}var ids=state._massVendorIds&&state._massVendorIds.length?state._massVendorIds:[state._menuVendorId];ids.forEach(function(id){var v=state.vendors.find(x=>x.id===id);if(!v)return;if(!v.markets.includes(mid)){v.markets.push(mid);if(!v.marketPayments)v.marketPayments={};v.marketPayments[mid]='outstanding';}sbSave('vendors',vendorToDb(v));});state._massVendorIds=null;closeModal('add-market-modal');renderApproved();updateMetrics();}
 function onCreditMarketChange(){var mid=document.getElementById('credit-market-select').value;var info=document.getElementById('credit-info');if(!mid){info.style.display='none';return;}var m=state.markets.find(x=>x.id===mid);var v=state.vendors.find(x=>x.id===state._menuVendorId);if(m&&v){info.style.display='block';info.textContent='Vendor will be moved to "'+m.name+'" and removed from all current markets. Payment status carries over.';};}
-function confirmCredit(){var mid=document.getElementById('credit-market-select').value;if(!mid){alert('Please select a market.');return;}var v=state.vendors.find(x=>x.id===state._menuVendorId);if(!v)return;v.markets=[mid];v.marketPayments={};v.marketPayments[mid]=v.payStatus==='paid'?'paid':'outstanding';sbSave('vendors',vendorToDb(v));closeModal('credit-modal');renderApproved();updateMetrics();}
+function confirmCredit(){var mid=document.getElementById('credit-market-select').value;if(!mid){alert('Please select a market.');return;}var ids=state._massVendorIds&&state._massVendorIds.length?state._massVendorIds:[state._menuVendorId];ids.forEach(function(id){var v=state.vendors.find(x=>x.id===id);if(!v)return;v.markets=[mid];v.marketPayments={};v.marketPayments[mid]=v.payStatus==='paid'?'paid':'outstanding';sbSave('vendors',vendorToDb(v));});state._massVendorIds=null;closeModal('credit-modal');renderApproved();updateMetrics();}
 function confirmRemoveApproved(){sbDel('vendors',state._menuVendorId);state.vendors=state.vendors.filter(v=>v.id!==state._menuVendorId);closeModal('remove-approved-modal');renderApproved();updateMetrics();}
+
+// ── APPROVED MASS ACTIONS ─────────────────────────────────────────
+function toggleAllApproved(cb){document.querySelectorAll('.va-check').forEach(c=>c.checked=cb.checked);}
+function openMassActionApproved(e){
+  e.stopPropagation();
+  var ids=[...new Set(Array.from(document.querySelectorAll('.va-check:checked')).map(c=>c.value))];
+  if(!ids.length){alert('Select at least one vendor first.');return;}
+  var menu=document.getElementById('mass-action-approved-menu');
+  document.getElementById('mass-action-approved-label').textContent=ids.length+' vendor'+(ids.length===1?' selected':' selected');
+  menu.style.display='block';
+  var rect=e.currentTarget.getBoundingClientRect();
+  var top=rect.bottom+6,left=rect.right-200;
+  if(left<8)left=8;
+  if(top+250>window.innerHeight)top=rect.top-260;
+  menu.style.top=top+'px';menu.style.left=left+'px';
+}
+function massActionApproved(action){
+  document.getElementById('mass-action-approved-menu').style.display='none';
+  var ids=[...new Set(Array.from(document.querySelectorAll('.va-check:checked')).map(c=>c.value))];
+  if(!ids.length){showToast('No vendors selected');return;}
+  state._massVendorIds=ids;
+  if(action==='reminder'){
+    var count=0;
+    ids.forEach(function(id){var v=state.vendors.find(x=>x.id===id);if(v&&calcPayStatus(v)!=='paid'){sendEmail(v.email,'Payment reminder — '+currentUser.market,buildReminderEmail(v));count++;}});
+    showToast(count?'Reminders sent to '+count+' vendor'+(count===1?'':'s'):'All selected vendors are fully paid');
+    state._massVendorIds=null;
+  } else if(action==='remove'){
+    var names=ids.map(id=>{var v=state.vendors.find(x=>x.id===id);return v?v.name:null;}).filter(Boolean);
+    document.getElementById('mass-remove-approved-list').innerHTML=names.map(n=>'<li style="padding:4px 0">'+esc(n)+'</li>').join('');
+    document.getElementById('mass-remove-approved-modal').classList.add('open');
+  } else if(action==='addmarket'){
+    var sel=document.getElementById('add-market-select');
+    sel.innerHTML='<option value="">Select a market...</option>'+state.markets.map(m=>'<option value="'+m.id+'">'+esc(m.name)+(m.published?'':' (draft)')+'</option>').join('');
+    document.getElementById('add-market-vendor-name').textContent=ids.length+' vendors';
+    document.getElementById('add-market-info').style.display='none';
+    document.getElementById('add-market-modal').classList.add('open');
+  } else if(action==='credit'){
+    var sel2=document.getElementById('credit-market-select');
+    sel2.innerHTML='<option value="">Select a market...</option>'+state.markets.map(m=>'<option value="'+m.id+'">'+esc(m.name)+(m.published?'':' (draft)')+'</option>').join('');
+    document.getElementById('credit-vendor-name').textContent=ids.length+' vendors';
+    document.getElementById('credit-info').style.display='none';
+    document.getElementById('credit-modal').classList.add('open');
+  } else if(action==='pay'){
+    document.getElementById('pay-modal-name').textContent=ids.length+' vendors';
+    document.getElementById('pay-step-1').style.display='block';
+    document.getElementById('pay-step-2').style.display='none';
+    document.getElementById('pay-step-1-info').style.display='none';
+    var sel3=document.getElementById('pay-market-sel');
+    sel3.innerHTML='<option value="">Choose a market...</option>'+state.markets.map(m=>'<option value="'+m.id+'">'+esc(m.name)+(m.published?'':' (draft)')+'</option>').join('');
+    document.getElementById('pay-modal').classList.add('open');
+  }
+}
+function confirmMassRemoveApproved(){
+  state._massVendorIds.forEach(function(id){sbDel('vendors',id);});
+  state.vendors=state.vendors.filter(v=>!state._massVendorIds.includes(v.id));
+  state._massVendorIds=null;
+  closeModal('mass-remove-approved-modal');
+  renderApproved();
+  updateMetrics();
+}
 
 // ── MARKET DASHBOARD ──────────────────────────────────────────────
 function openMarketDashboard(mid){
