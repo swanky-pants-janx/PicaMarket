@@ -164,8 +164,8 @@ function stallTypeLabel(v,m){return getStallType(v,m).name||'Normal stall';}
 function stallTypeBadge(v,m){var t=getStallType(v,m);var c=t.color||'#6b7280';return'<span class="badge" style="background:'+c+'22;color:'+c+'">'+esc(t.name)+'</span>';}
 async function refreshPending(){var btn=document.getElementById('refresh-btn');if(btn){btn.textContent='↻ Loading...';btn.disabled=true;}await loadUserData();renderPending();updateMetrics();if(btn){btn.textContent='↻ Refresh';btn.disabled=false;}}
 async function loadUserData(){var[{data:mkts},{data:vnds}]=await Promise.all([_sb.from('markets').select('*').eq('user_id',currentUser.id).order('created_at'),_sb.from('vendors').select('*').eq('user_id',currentUser.id).order('created_at')]);state.markets=(mkts||[]).map(dbToMarket);state.vendors=(vnds||[]).map(dbToVendor);}
-function sbSave(table,obj){_sb.from(table).upsert(obj).then(({error})=>{if(error)console.error('DB save error:',error);});}
-function sbDel(table,id){_sb.from(table).delete().eq('id',id).then(({error})=>{if(error)console.error('DB delete error:',error);});}
+async function sbSave(table,obj){var{error}=await _sb.from(table).upsert(obj);if(error){console.error('DB save error:',error);showToast('Save failed — please try again.');return false;}return true;}
+async function sbDel(table,id){var{error}=await _sb.from(table).delete().eq('id',id);if(error){console.error('DB delete error:',error);showToast('Delete failed — please try again.');return false;}return true;}
 
 // ── STATE ─────────────────────────────────────────────────────────
 // Each vendor object shape:
@@ -242,12 +242,12 @@ function toggleExpand(id){state.expandedRows[id]=!state.expandedRows[id];renderP
 function toggleExpandMobile(id){state.expandedRows[id+'_m']=!state.expandedRows[id+'_m'];renderPending();}
 function toggleAll(cb){document.querySelectorAll('.v-check').forEach(c=>c.checked=cb.checked);}
 function disapproveSelected(){var checked=[...new Set(Array.from(document.querySelectorAll('.v-check:checked')).map(c=>c.value))];if(!checked.length){alert('Select at least one vendor to remove.');return;}state._removeQueue=checked;var names=checked.map(id=>{var v=state.vendors.find(x=>x.id===id);return v?v.name:null;}).filter(Boolean);document.getElementById('remove-modal-list').innerHTML=names.map(n=>'<li style="padding:4px 0;font-size:13px">'+esc(n)+'</li>').join('');document.getElementById('remove-modal').classList.add('open');}
-function confirmRemove(){state._removeQueue.forEach(id=>sbDel('vendors',id));state.vendors=state.vendors.filter(v=>!state._removeQueue.includes(v.id));state._removeQueue=[];closeModal('remove-modal');renderPending();updateMetrics();}
+async function confirmRemove(){var ids=state._removeQueue.slice();await Promise.all(ids.map(id=>sbDel('vendors',id)));state.vendors=state.vendors.filter(v=>!ids.includes(v.id));state._removeQueue=[];closeModal('remove-modal');renderPending();updateMetrics();}
 function approveSelected(){var checked=[...new Set(Array.from(document.querySelectorAll('.v-check:checked')).map(c=>c.value))];if(!checked.length){alert('Select at least one vendor to approve.');return;}state._approveQueue=checked.slice();openNextApproval();}
 function closeApprovalModal(){state._approveQueue=[];closeModal('approve-modal');}
 function openNextApproval(){if(!state._approveQueue.length){updateMetrics();renderPending();return;}var id=state._approveQueue[0];var v=state.vendors.find(x=>x.id===id);if(!v){state._approveQueue.shift();openNextApproval();return;}document.getElementById('approve-modal-name').textContent=v.name;document.getElementById('approve-modal-count').textContent=state._approveQueue.length>1?state._approveQueue.length+' vendors in queue':'';document.getElementById('approve-market-checks').innerHTML=v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);if(!m)return'';var badge=m&&m.stallTypes&&m.stallTypes.length>1?' &nbsp;'+stallTypeBadge(v,m):'';return'<label style="display:flex;align-items:center;gap:10px;padding:12px;border:0.5px solid var(--border);border-radius:8px;cursor:pointer;margin-bottom:8px;background:var(--bg3)"><input type="checkbox" class="approve-mkt-cb" value="'+mid+'" checked style="width:18px;height:18px;accent-color:var(--blue)"><div><div style="font-size:14px;font-weight:500;color:var(--text)">'+esc(m.name)+badge+'</div><div style="font-size:12px;color:var(--text2)">'+m.dates.join(' · ')+' · R'+getStallFee(v,m)+'/stall'+' ('+stallTypeLabel(v,m)+')</div></div></label>';}).join('');document.getElementById('approve-modal').classList.add('open');}
 
-function mergeApproveVendor(v,sel){var mnames=sel.map(mid=>{var m=state.markets.find(x=>x.id===mid);return m?m.name:mid;}).join(', ');var existing=state.vendors.find(x=>x.id!==v.id&&x.status==='approved'&&x.email===v.email);if(existing){sel.forEach(mid=>{if(!existing.markets.includes(mid))existing.markets.push(mid);if(!existing.marketPayments)existing.marketPayments={};if(!existing.marketPayments[mid])existing.marketPayments[mid]='outstanding';});sbSave('vendors',vendorToDb(existing));sbDel('vendors',v.id);state.vendors=state.vendors.filter(x=>x.id!==v.id);}else{v.status='approved';v.markets=sel.slice();v.payStatus='outstanding';v.payMethod=null;v.marketPayments={};sel.forEach(mid=>{v.marketPayments[mid]='outstanding';});v.approvedAt=new Date().toLocaleDateString('en-ZA');sbSave('vendors',vendorToDb(v));}var paySection='';
+async function mergeApproveVendor(v,sel){var mnames=sel.map(mid=>{var m=state.markets.find(x=>x.id===mid);return m?m.name:mid;}).join(', ');var existing=state.vendors.find(x=>x.id!==v.id&&x.status==='approved'&&x.email===v.email);if(existing){sel.forEach(mid=>{if(!existing.markets.includes(mid))existing.markets.push(mid);if(!existing.marketPayments)existing.marketPayments={};if(!existing.marketPayments[mid])existing.marketPayments[mid]='outstanding';});var ok=await sbSave('vendors',vendorToDb(existing));await sbDel('vendors',v.id);if(!ok){showToast('Approval failed — please try again.');return;}state.vendors=state.vendors.filter(x=>x.id!==v.id);}else{v.status='approved';v.markets=sel.slice();v.payStatus='outstanding';v.payMethod=null;v.marketPayments={};sel.forEach(mid=>{v.marketPayments[mid]='outstanding';});v.approvedAt=new Date().toLocaleDateString('en-ZA');var ok=await sbSave('vendors',vendorToDb(v));if(!ok){showToast('Approval failed — please try again.');return;}}var paySection='';
   var _hasPF=currentUser.payfastMerchantId&&currentUser.payfastMerchantKey;
   var _hasBank=currentUser.bankHolder&&currentUser.bankName&&currentUser.bankAccNum;
   if(_hasPF){
@@ -484,7 +484,7 @@ function onAddMarketChange(){var mid=document.getElementById('add-market-select'
 function confirmAddMarket(){var mid=document.getElementById('add-market-select').value;if(!mid){alert('Please select a market.');return;}var ids=state._massVendorIds&&state._massVendorIds.length?state._massVendorIds:[state._menuVendorId];ids.forEach(function(id){var v=state.vendors.find(x=>x.id===id);if(!v)return;if(!v.markets.includes(mid)){v.markets.push(mid);if(!v.marketPayments)v.marketPayments={};v.marketPayments[mid]='outstanding';}sbSave('vendors',vendorToDb(v));});state._massVendorIds=null;closeModal('add-market-modal');renderApproved();updateMetrics();}
 function onCreditMarketChange(){var mid=document.getElementById('credit-market-select').value;var info=document.getElementById('credit-info');if(!mid){info.style.display='none';return;}var m=state.markets.find(x=>x.id===mid);var v=state.vendors.find(x=>x.id===state._menuVendorId);if(m&&v){info.style.display='block';info.textContent='Vendor will be moved to "'+m.name+'" and removed from all current markets. Payment status carries over.';};}
 function confirmCredit(){var mid=document.getElementById('credit-market-select').value;if(!mid){alert('Please select a market.');return;}var ids=state._massVendorIds&&state._massVendorIds.length?state._massVendorIds:[state._menuVendorId];ids.forEach(function(id){var v=state.vendors.find(x=>x.id===id);if(!v)return;v.markets=[mid];v.marketPayments={};v.marketPayments[mid]=v.payStatus==='paid'?'paid':'outstanding';sbSave('vendors',vendorToDb(v));});state._massVendorIds=null;closeModal('credit-modal');renderApproved();updateMetrics();}
-function confirmRemoveApproved(){sbDel('vendors',state._menuVendorId);state.vendors=state.vendors.filter(v=>v.id!==state._menuVendorId);closeModal('remove-approved-modal');renderApproved();updateMetrics();}
+async function confirmRemoveApproved(){var id=state._menuVendorId;var ok=await sbDel('vendors',id);if(!ok)return;state.vendors=state.vendors.filter(v=>v.id!==id);closeModal('remove-approved-modal');renderApproved();updateMetrics();}
 
 // ── APPROVED MASS ACTIONS ─────────────────────────────────────────
 function toggleAllApproved(cb){document.querySelectorAll('.va-check').forEach(c=>c.checked=cb.checked);}
@@ -537,13 +537,17 @@ function massActionApproved(action){
     document.getElementById('pay-modal').classList.add('open');
   }
 }
-function confirmMassRemoveApproved(){
-  state._massVendorIds.forEach(function(id){sbDel('vendors',id);});
-  state.vendors=state.vendors.filter(v=>!state._massVendorIds.includes(v.id));
+async function confirmMassRemoveApproved(){
+  var ids=state._massVendorIds.slice();
+  var results=await Promise.all(ids.map(function(id){return sbDel('vendors',id);}));
+  var deleted=ids.filter(function(_,i){return results[i];});
+  var failed=ids.length-deleted.length;
+  state.vendors=state.vendors.filter(v=>!deleted.includes(v.id));
   state._massVendorIds=null;
   closeModal('mass-remove-approved-modal');
   renderApproved();
   updateMetrics();
+  if(failed>0)showToast(failed+' delete'+(failed===1?' failed':' failed')+' — please try again.');
 }
 
 // ── MARKET DASHBOARD ──────────────────────────────────────────────
