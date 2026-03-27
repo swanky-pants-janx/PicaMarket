@@ -29,7 +29,7 @@
 
 <div id="auth-screen" class="auth-wrap">
   <div class="auth-card">
-    <div class="auth-logo">PicaMarket</div>
+    <div class="auth-logo"><img src="PicaMarketLogo.png" alt="PicaMarket" style="max-width:180px;height:auto"></div>
     <div class="auth-sub">Market runner dashboard</div>
     <div class="auth-tabs">
       <div class="auth-tab active" onclick="switchAuthTab('login')">Log in</div>
@@ -63,7 +63,7 @@
 
 <div id="dashboard" style="display:none">
   <nav class="nav">
-    <span class="nav-brand" id="nav-brand">PicaMarket</span>
+    <span class="nav-brand" id="nav-brand"><img src="PicaMarketLogo.png" alt="PicaMarket" style="height:28px;width:auto;display:block"></span>
     <div class="nav-bell-area">
       <button class="nav-bell-btn" onclick="showPage('approval')" title="Vendor applications">
         <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -100,6 +100,7 @@
   </nav>
 
   <aside class="sidebar" id="sidebar">
+    <div style="padding:16px 12px 8px;display:flex;align-items:center;justify-content:center"><img src="PicaMarketLogo.png" alt="PicaMarket" style="max-width:120px;height:auto"></div>
     <button class="sidebar-item active" onclick="showPage('home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></button>
     <button class="sidebar-item" onclick="showPage('approval')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Vendor Approval</span></button>
     <button class="sidebar-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Approved Vendors</span></button>
@@ -254,7 +255,7 @@
     <div style="background:var(--bg2);min-height:calc(100vh - var(--nav-h))">
     <div class="public-page">
       <div class="page-banner blue" style="margin-bottom:1rem"><div class="page-banner-icon">&#128065;</div><div><div class="page-banner-title">PicaMarket — Vendor-facing page</div><div class="page-banner-desc">This is what vendors will see. They can browse your published markets and submit an application. Vendors cannot see the rest of the dashboard.</div></div></div>
-      <div class="public-banner"><div class="public-banner-text"><div style="font-size:20px;font-weight:500;color:var(--blue)" id="pub-title">Upcoming Markets</div><div style="font-size:13px;color:var(--text2);margin-top:4px">Browse and apply to attend as a vendor</div></div></div>
+      <div class="public-banner"><div style="margin-bottom:1rem;text-align:center"><img src="PicaMarketLogo.png" alt="PicaMarket" style="max-width:140px;height:auto"></div><div class="public-banner-text"><div style="font-size:20px;font-weight:500;color:var(--blue)" id="pub-title">Upcoming Markets</div><div style="font-size:13px;color:var(--text2);margin-top:4px">Browse and apply to attend as a vendor</div></div></div>
       <div class="tabs-inner">
         <div class="tab-inner active" onclick="pubTab('browse')">Browse markets</div>
         <div class="tab-inner" onclick="pubTab('apply')">Apply as vendor</div>
