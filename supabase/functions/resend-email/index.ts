@@ -20,12 +20,15 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id')
       .eq('id', user_id)
       .single()
-    if (!profile) return new Response('Unauthorized', { status: 401 })
+    if (!profile) {
+      console.error('Profile lookup failed for user_id:', user_id, 'error:', profileError)
+      return new Response('Unauthorized', { status: 401 })
+    }
 
     const apiKey = Deno.env.get('RESEND_API_KEY')
     const from = Deno.env.get('RESEND_FROM') || 'PicaMarket <noreply@picamarket.site>'
