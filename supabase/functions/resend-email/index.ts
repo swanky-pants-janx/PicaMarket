@@ -11,22 +11,21 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
   try {
-    // Require a valid Supabase user JWT
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) return new Response('Unauthorized', { status: 401 })
+    const { to, subject, html, user_id } = await req.json()
+    if (!to || !subject || !html || !user_id) return new Response('Missing fields', { status: 400 })
+    if (!EMAIL_RE.test(to)) return new Response('Invalid recipient', { status: 400 })
 
+    // Verify caller is a known coordinator using service role
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) return new Response('Unauthorized', { status: 401 })
-
-    const { to, subject, html } = await req.json()
-    if (!to || !subject || !html) return new Response('Missing fields', { status: 400 })
-    if (!EMAIL_RE.test(to)) return new Response('Invalid recipient', { status: 400 })
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', user_id)
+      .single()
+    if (!profile) return new Response('Unauthorized', { status: 401 })
 
     const apiKey = Deno.env.get('RESEND_API_KEY')
     const from = Deno.env.get('RESEND_FROM') || 'PicaMarket <noreply@picamarket.site>'
