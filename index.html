@@ -73,8 +73,8 @@
     </div>
     <div class="nav-tabs">
       <div class="nav-tab active" onclick="showPage('home')">Home</div>
-      <div class="nav-tab" onclick="showPage('approval')">Vendor Approval</div>
-      <div class="nav-tab" onclick="showPage('approved')">Approved Vendors</div>
+      <div class="nav-tab" onclick="showPage('approval')">Vendor Approval<span class="nav-notif-dot" data-for="approval" style="display:none"></span></div>
+      <div class="nav-tab" onclick="showPage('approved')">Approved Vendors<span class="nav-notif-dot" data-for="approved" style="display:none"></span></div>
       <div class="nav-tab" onclick="showPage('markets')">Markets</div>
       <div class="nav-tab" onclick="showPage('form-builder')">Form Builder</div>
     </div>
@@ -93,8 +93,8 @@
   </nav>
   <nav class="bottom-nav">
     <button class="bottom-nav-item active" onclick="showPage('home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></button>
-    <button class="bottom-nav-item" onclick="showPage('approval')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Approval</span></button>
-    <button class="bottom-nav-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Vendors</span></button>
+    <button class="bottom-nav-item" onclick="showPage('approval')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Approval</span><span class="nav-notif-dot" data-for="approval" style="display:none"></span></button>
+    <button class="bottom-nav-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Vendors</span><span class="nav-notif-dot" data-for="approved" style="display:none"></span></button>
     <button class="bottom-nav-item" onclick="showPage('markets')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Markets</span></button>
     <button class="bottom-nav-item" onclick="showPage('form-builder')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M17 5h1a2 2 0 012 2v13a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h1"/><path d="M9 12h6M9 16h4"/></svg><span>Form</span></button>
     <button class="bottom-nav-item" onclick="showPage('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Settings</span></button>
@@ -102,8 +102,8 @@
 
   <aside class="sidebar" id="sidebar">
     <button class="sidebar-item active" onclick="showPage('home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></button>
-    <button class="sidebar-item" onclick="showPage('approval')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Vendor Approval</span></button>
-    <button class="sidebar-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Approved Vendors</span></button>
+    <button class="sidebar-item" onclick="showPage('approval')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Vendor Approval</span><span class="nav-notif-dot" data-for="approval" style="display:none"></span></button>
+    <button class="sidebar-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Approved Vendors</span><span class="nav-notif-dot" data-for="approved" style="display:none"></span></button>
     <button class="sidebar-item" onclick="showPage('markets')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Markets</span></button>
     <button class="sidebar-item" onclick="showPage('form-builder')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M17 5h1a2 2 0 012 2v13a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h1"/><path d="M9 12h6M9 16h4"/></svg><span>Form Builder</span></button>
     <div class="sidebar-spacer"></div>
