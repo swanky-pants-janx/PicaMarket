@@ -7,9 +7,11 @@ const corsHeaders = {
 }
 
 // PayFast production IP ranges (https://developers.payfast.co.za/docs#step_4_confirm_payment)
+// Sandbox IP added: 144.126.193.139 (observed from sandbox ITN callbacks)
 const PAYFAST_CIDRS = [
   ['197.97.145.144', 28],
   ['41.74.179.192', 27],
+  ['144.126.193.139', 32],
 ] as const
 
 function ipToInt(ip: string): number {
