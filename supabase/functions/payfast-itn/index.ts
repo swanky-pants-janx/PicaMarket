@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
 
     const { data: vendor, error } = await supabase
       .from('vendors')
-      .select('market_payments, market_methods, markets')
+      .select('name, email, market_payments, market_methods, markets, user_id')
       .eq('id', vendorId)
       .single()
 
@@ -105,6 +105,28 @@ Deno.serve(async (req) => {
     }).eq('id', vendorId)
 
     console.log('PayFast ITN: marked vendor', vendorId, 'market', marketId, 'as paid')
+
+    // Notify coordinator
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('coordinator_email, market_name')
+      .eq('id', vendor.user_id)
+      .single()
+
+    const apiKey = Deno.env.get('RESEND_API_KEY')
+    const from = Deno.env.get('RESEND_FROM') || 'PicaMarket <noreply@picamarket.site>'
+    if (profile?.coordinator_email && apiKey) {
+      const subject = 'Payment received — ' + vendor.name
+      const html = '<p>A payment has been received from <strong>' + vendor.name + '</strong> (' + vendor.email + ').</p>' +
+        '<p><strong>Status:</strong> ' + payStatus + '</p>' +
+        '<p>Log in to your dashboard to view the update.</p>'
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+        body: JSON.stringify({ from, to: profile.coordinator_email, subject, html }),
+      }).catch(err => console.error('PayFast ITN: email error', err))
+    }
+
     return new Response('OK', { status: 200 })
 
   } catch (err) {
