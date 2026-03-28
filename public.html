@@ -151,8 +151,6 @@ function collectCustomResponses(fields){
   return responses;
 }
 
-function sendEmail(to,subject,html){fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/resend-email',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_f64M7MFa88zOMuZ083v-lw_Ypgcyhx-'},body:JSON.stringify({to,subject,html})}).catch(function(err){console.error('Email error:',err);});
-}
 
 function showError(msg) {
   document.getElementById('loading').style.display = 'none';
@@ -284,8 +282,9 @@ async function submitVendorForm() {
     return;
   }
 
+  var vendorId = crypto.randomUUID();
   var {error} = await _sb.from('vendors').insert({
-    id: crypto.randomUUID(),
+    id: vendorId,
     user_id: coordinator.id,
     name: name,
     description: desc,
@@ -303,10 +302,12 @@ async function submitVendorForm() {
   });
 
   btn.textContent = 'Submit application'; btn.disabled = false;
-  var notifyEnabled=!coordinator.settings||coordinator.settings.notify_on_apply!==false;
-  if (!error && coordinator.coordinator_email && notifyEnabled) {
-    var mnames = selectedMarkets.map(function(mid){var m=markets.find(function(x){return x.id===mid;});return m?m.name:mid;}).join(', ');
-    sendEmail(coordinator.coordinator_email,'New vendor application — '+name,'<p>A new vendor application has been submitted to <strong>'+esc(coordinator.market_name)+'</strong>.</p><p><strong>Stall name:</strong> '+esc(name)+'<br><strong>Email:</strong> '+esc(email)+'<br><strong>Markets:</strong> '+esc(mnames)+'<br><strong>Description:</strong> '+esc(desc)+'</p><p>Log in to your dashboard to review and approve.</p>');
+  if (!error) {
+    fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/notify-vendor-submission', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer sb_publishable_f64M7MFa88zOMuZ083v-lw_Ypgcyhx-'},
+      body: JSON.stringify({vendor_id: vendorId})
+    }).catch(function(err){ console.error('Notify error:', err); });
   }
 
   if (error) { alert('Something went wrong. Please try again.'); console.error(error); return; }
