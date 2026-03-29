@@ -24,6 +24,22 @@
   .mf-page-body .form-label{font-size:14px;margin-bottom:8px}
   .mf-page-body .form-input{padding:11px 14px}
   @media(max-width:540px){.mf-row{grid-template-columns:1fr}}
+  .home-cal{margin-top:1.5rem}
+  .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .cal-month-label{font-size:15px;font-weight:600;color:var(--text)}
+  .cal-nav-btn{background:none;border:0.5px solid var(--border);border-radius:6px;cursor:pointer;padding:3px 11px;color:var(--text2);font-size:18px;line-height:1.4}
+  .cal-nav-btn:hover{background:var(--bg3)}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+  .cal-weekday{font-size:10px;font-weight:600;text-align:center;padding:4px 0 6px;color:var(--text3);letter-spacing:0.05em;text-transform:uppercase}
+  .cal-day{display:flex;flex-direction:column;align-items:center;padding:5px 0 4px;border-radius:7px;font-size:13px;color:var(--text3);min-width:0}
+  .cal-day.cur-month{color:var(--text2)}
+  .cal-day.has-market{cursor:pointer;color:var(--blue)}
+  .cal-day.has-market:hover{background:var(--bg3)}
+  .cal-day.has-market .cal-dot{display:block}
+  .cal-day.today-cell .day-num{background:var(--blue);color:#fff;border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:600}
+  .cal-day.today-cell.has-market .day-num{background:var(--blue);color:#fff}
+  .cal-dot{display:none;width:5px;height:5px;border-radius:50%;background:var(--blue);margin-top:3px}
+  .cal-day.today-cell .cal-dot{background:#fff;opacity:0.8}
 </style>
 </head>
 <body>
@@ -145,6 +161,7 @@
         <div class="home-card-desc">Customise the vendor application form</div>
       </div>
     </div>
+    <div id="home-calendar"></div>
   </div>
   <div id="page-approval" class="page">
     <div class="page-banner amber"><div class="page-banner-icon">&#9998;</div><div><div class="page-banner-title">Vendor Approval</div><div class="page-banner-desc">New applications submitted via your public vendor page appear here. Click a stall name to expand the full application — including their description, requested markets, photos, and contact email. Tick one or more vendors using the checkboxes, then use <strong>Approve</strong> to accept (you'll choose which markets they may attend) or <strong>Remove</strong> to decline. <strong>Refresh</strong> pulls in any new submissions since the page loaded. <strong>Export CSV</strong> downloads the current list as a spreadsheet.</div></div></div>

@@ -210,6 +210,52 @@ function renderHome(){
   var upcoming=state.markets.filter(function(m){return m.dates&&m.dates.some(function(d){return d>=today;});}).length;
   var ep=document.getElementById('hm-pending');if(ep)ep.textContent=pending;
   var eu=document.getElementById('hm-upcoming');if(eu)eu.textContent=upcoming;
+  renderCalendar();
+}
+
+// ── CALENDAR ──────────────────────────────────────────────────────
+var _calYear,_calMonth;
+function renderCalendar(){
+  var el=document.getElementById('home-calendar');if(!el)return;
+  var now=new Date();
+  if(!_calYear){_calYear=now.getFullYear();_calMonth=now.getMonth();}
+  var today=now.toISOString().slice(0,10);
+  var dateMap={};
+  state.markets.forEach(function(m){(m.dates||[]).forEach(function(d){if(!dateMap[d])dateMap[d]=[];dateMap[d].push(m.name);});});
+  var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var firstDow=(new Date(_calYear,_calMonth,1).getDay()+6)%7;
+  var daysInMonth=new Date(_calYear,_calMonth+1,0).getDate();
+  var daysInPrev=new Date(_calYear,_calMonth,0).getDate();
+  var prevYear=_calMonth===0?_calYear-1:_calYear,prevMonth=_calMonth===0?11:_calMonth-1;
+  var nextYear=_calMonth===11?_calYear+1:_calYear,nextMonth=_calMonth===11?0:_calMonth+1;
+  var cells=[];
+  for(var i=0;i<firstDow;i++)cells.push({d:daysInPrev-firstDow+1+i,mo:prevMonth,yr:prevYear,cur:false});
+  for(var d=1;d<=daysInMonth;d++)cells.push({d:d,mo:_calMonth,yr:_calYear,cur:true});
+  var total=Math.ceil(cells.length/7)*7;
+  for(var n=1;cells.length<total;n++)cells.push({d:n,mo:nextMonth,yr:nextYear,cur:false});
+  var pad=function(n){return n<10?'0'+n:''+n;};
+  var grid=cells.map(function(c){
+    var ds=c.yr+'-'+pad(c.mo+1)+'-'+pad(c.d);
+    var mkts=dateMap[ds]||[];var hasM=mkts.length>0;
+    var isToday=ds===today;
+    var cls='cal-day'+(c.cur?' cur-month':'')+(isToday?' today-cell':'')+(hasM?' has-market':'');
+    var attrs=hasM?' onclick="calSelectDay(\''+ds+'\')" title="'+mkts.map(esc).join(', ')+'"':'';
+    return'<div class="'+cls+'"'+attrs+'><span class="day-num">'+c.d+'</span><span class="cal-dot"></span></div>';
+  }).join('');
+  el.innerHTML='<div class="home-cal"><div class="cal-header"><button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button><span class="cal-month-label">'+MONTHS[_calMonth]+' '+_calYear+'</span><button class="cal-nav-btn" onclick="calNav(1)">&#8250;</button></div><div class="cal-grid">'+DAYS.map(function(d){return'<div class="cal-weekday">'+d+'</div>';}).join('')+grid+'</div><div id="cal-day-info" style="min-height:8px"></div></div>';
+}
+function calNav(dir){
+  _calMonth+=dir;
+  if(_calMonth>11){_calMonth=0;_calYear++;}
+  if(_calMonth<0){_calMonth=11;_calYear--;}
+  renderCalendar();
+}
+function calSelectDay(ds){
+  var tip=document.getElementById('cal-day-info');if(!tip)return;
+  var names=[];state.markets.forEach(function(m){if((m.dates||[]).includes(ds))names.push(m.name);});
+  if(!names.length)return;
+  tip.innerHTML='<div style="margin-top:10px;padding:10px 12px;background:var(--bg3);border-radius:8px;border:0.5px solid var(--border)"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text3);margin-bottom:4px">'+ds+'</div>'+names.map(function(n){return'<div style="font-size:13px;color:var(--text);font-weight:500">'+esc(n)+'</div>';}).join('')+'</div>';
 }
 
 // ── VENDOR APPROVAL ───────────────────────────────────────────────
