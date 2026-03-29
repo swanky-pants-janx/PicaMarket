@@ -243,7 +243,7 @@ function renderCalendar(){
     var attrs=hasM?' onclick="calSelectDay(\''+ds+'\')" title="'+mkts.map(esc).join(', ')+'"':'';
     return'<div class="'+cls+'"'+attrs+'><span class="day-num">'+c.d+'</span><span class="cal-dot"></span></div>';
   }).join('');
-  el.innerHTML='<div class="home-cal"><div class="cal-header"><button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button><span class="cal-month-label">'+MONTHS[_calMonth]+' '+_calYear+'</span><button class="cal-nav-btn" onclick="calNav(1)">&#8250;</button></div><div class="cal-grid">'+DAYS.map(function(d){return'<div class="cal-weekday">'+d+'</div>';}).join('')+grid+'</div><div id="cal-day-info" style="min-height:8px"></div></div>';
+  el.innerHTML='<div class="home-cal"><div class="mf-section-label" style="margin-top:2rem">Market Calendar</div><div class="cal-header"><button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button><span class="cal-month-label">'+MONTHS[_calMonth]+' '+_calYear+'</span><button class="cal-nav-btn" onclick="calNav(1)">&#8250;</button></div><div class="cal-grid">'+DAYS.map(function(d){return'<div class="cal-weekday">'+d+'</div>';}).join('')+grid+'</div><div id="cal-day-info" style="min-height:8px"></div></div>';
 }
 function calNav(dir){
   _calMonth+=dir;
