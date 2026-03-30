@@ -401,6 +401,10 @@
           </div>
           <hr style="border:none;border-top:0.5px solid var(--border);margin-bottom:1.25rem">
           <button class="btn" style="font-size:13px" onclick="sendPasswordResetFromAccount()">Change password</button>
+          <hr style="border:none;border-top:0.5px solid var(--border);margin:1.5rem 0 1.25rem">
+          <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px">Danger zone</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:1rem">Permanently delete your account and all associated data. This cannot be undone.</div>
+          <button class="btn danger" style="font-size:13px" onclick="document.getElementById('delete-account-confirm-input').value='';document.getElementById('delete-account-confirm-btn').disabled=true;document.getElementById('delete-account-confirm-input').placeholder=currentUser.market;openModal('delete-account-modal')">Delete account</button>
         </div>
       </div>
     </div>
@@ -633,6 +637,20 @@
   <button class="lb-arrow lb-next" onclick="event.stopPropagation();lightboxNav(1)">&#8250;</button>
   <div id="lightbox-counter"></div>
 </div>
+
+<!-- DELETE ACCOUNT MODAL (organiser) -->
+<div class="modal-overlay" id="delete-account-modal"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-header"><h3>Delete account</h3><button class="modal-close" onclick="closeModal('delete-account-modal')">&#x2715;</button></div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:0.75rem">This will permanently delete your account, all your markets, vendor applications, and settings. <strong style="color:var(--red)">This cannot be undone.</strong></p>
+  <div class="form-group" style="margin-bottom:1rem">
+    <label class="form-label">Type your market name to confirm</label>
+    <input class="form-input" id="delete-account-confirm-input" type="text" placeholder="" oninput="checkDeleteConfirm()">
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn" style="flex:1" onclick="closeModal('delete-account-modal')">Cancel</button>
+    <button class="btn danger" style="flex:1" id="delete-account-confirm-btn" disabled onclick="confirmDeleteAccount()">Delete account</button>
+  </div>
+</div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.100.1/dist/umd/supabase.min.js" integrity="sha384-RJpiDscpUIa2tmNUABXIB4EgEoaAMRcl5+yJJxYC+kXKvCFctiqLTn9j1AwOc9n1" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0/js/md5.min.js" integrity="sha384-JmVtRz6RWiXnA14QbIOJzPuU3MidULOpBP66deeLLyyoF4Tr/gZlbkHkL6vTthxH" crossorigin="anonymous"></script>

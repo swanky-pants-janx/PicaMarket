@@ -10,6 +10,8 @@ var _vdDarkMode = false;
 
 function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function closeModal(id){var el=document.getElementById(id);if(el)el.classList.remove('open');}
+function openModal(id){var el=document.getElementById(id);if(el)el.classList.add('open');}
 
 // ── SESSION ───────────────────────────────────────────────────────
 _sb.auth.onAuthStateChange(async(event, session) => {
@@ -271,6 +273,33 @@ async function vdSaveAccountSettings() {
   document.getElementById('vp-stall-name').value = stallName;
   document.getElementById('vp-email').value = email;
   showToast('Account settings saved!');
+}
+
+function vdOpenDeleteModal() {
+  document.getElementById('vd-delete-confirm-input').value = '';
+  document.getElementById('vd-delete-confirm-input').placeholder = _vendorProfile.stall_name || '';
+  document.getElementById('vd-delete-confirm-btn').disabled = true;
+  openModal('vd-delete-account-modal');
+}
+
+function vdCheckDeleteConfirm() {
+  var inp = document.getElementById('vd-delete-confirm-input');
+  var btn = document.getElementById('vd-delete-confirm-btn');
+  if (!inp || !btn) return;
+  btn.disabled = inp.value.trim() !== (_vendorProfile.stall_name || '');
+}
+
+async function vdConfirmDeleteAccount() {
+  var btn = document.getElementById('vd-delete-confirm-btn');
+  btn.textContent = 'Deleting...'; btn.disabled = true;
+  var { data: { session } } = await _sb.auth.getSession();
+  var res = await fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/delete-account', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token }
+  });
+  if (!res.ok) { showToast('Delete failed. Please try again.'); btn.textContent = 'Delete account'; btn.disabled = false; return; }
+  await _sb.auth.signOut();
+  window.location.href = 'index.html';
 }
 
 async function vdSendPasswordReset() {
