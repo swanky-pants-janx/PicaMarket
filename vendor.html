@@ -30,8 +30,8 @@
   <nav class="nav">
     <span class="nav-brand" id="vd-nav-brand">PicaMarket</span>
     <div class="nav-tabs">
-      <div class="nav-tab active" onclick="vdShowPage('profile')">My Profile</div>
-      <div class="nav-tab" onclick="vdShowPage('directory')">Market Directory</div>
+      <div class="nav-tab active" onclick="vdShowPage('directory')">Market Directory</div>
+      <div class="nav-tab" onclick="vdShowPage('profile')">My Profile</div>
     </div>
     <div class="nav-right">
       <span class="nav-user" id="vd-nav-user"></span>
@@ -42,13 +42,13 @@
     </div>
   </nav>
   <nav class="bottom-nav">
-    <button class="bottom-nav-item active" onclick="vdShowPage('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></button>
-    <button class="bottom-nav-item" onclick="vdShowPage('directory')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span>Directory</span></button>
+    <button class="bottom-nav-item active" onclick="vdShowPage('directory')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span>Directory</span></button>
+    <button class="bottom-nav-item" onclick="vdShowPage('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></button>
   </nav>
 
   <aside class="sidebar" id="vd-sidebar">
-    <button class="sidebar-item active" onclick="vdShowPage('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>My Profile</span></button>
-    <button class="sidebar-item" onclick="vdShowPage('directory')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span>Market Directory</span></button>
+    <button class="sidebar-item active" onclick="vdShowPage('directory')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span>Market Directory</span></button>
+    <button class="sidebar-item" onclick="vdShowPage('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>My Profile</span></button>
     <div class="sidebar-spacer"></div>
     <div class="sidebar-user" id="vd-sidebar-user"></div>
     <div class="sidebar-divider"></div>
@@ -58,7 +58,7 @@
   <main class="main-content">
 
     <!-- PROFILE PAGE -->
-    <div id="vd-page-profile" class="page active">
+    <div id="vd-page-profile" class="page">
       <h2 style="margin-bottom:0.5rem">My Profile</h2>
       <p class="page-sub" style="margin-bottom:1.5rem">Save your vendor details to auto-fill market applications faster.</p>
       <div class="card" style="max-width:560px">
@@ -86,7 +86,7 @@
     </div>
 
     <!-- DIRECTORY PAGE -->
-    <div id="vd-page-directory" class="page">
+    <div id="vd-page-directory" class="page active">
       <h2 style="margin-bottom:0.5rem">Market Directory</h2>
       <p class="page-sub" style="margin-bottom:1.5rem">Browse market organisers on PicaMarket and apply to their published markets.</p>
       <div id="vd-dir-content">
@@ -99,6 +99,26 @@
 </div>
 
 <div id="toast"></div>
+
+<!-- VENDOR ONBOARDING -->
+<div id="vd-onboarding" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:none;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--bg);border-radius:16px;padding:32px;max-width:460px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+    <h2 style="margin:0 0 0.5rem">Welcome to PicaMarket!</h2>
+    <p style="font-size:14px;color:var(--text2);margin:0 0 1.5rem">Thanks for signing up as a vendor. Let's set up your stall profile so you can apply to markets in seconds.</p>
+    <div class="form-group">
+      <label class="form-label">What's your stall called? *</label>
+      <input class="form-input" id="ob-stall-name" type="text" placeholder="e.g. Sunshine Bakes">
+    </div>
+    <div class="form-group">
+      <label class="form-label">What do you sell?</label>
+      <textarea class="form-input" id="ob-what-you-sell" rows="3" placeholder="e.g. Handmade candles, soaps, and natural skincare products." style="resize:vertical;min-height:80px"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:0.5rem">
+      <button class="btn" style="flex:1" onclick="vdSkipOnboarding()">Skip for now</button>
+      <button class="btn primary" style="flex:2" onclick="vdFinishOnboarding()">Save &amp; get started</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.100.1/dist/umd/supabase.min.js" integrity="sha384-RJpiDscpUIa2tmNUABXIB4EgEoaAMRcl5+yJJxYC+kXKvCFctiqLTn9j1AwOc9n1" crossorigin="anonymous"></script>
 <script src="vendor.js"></script>

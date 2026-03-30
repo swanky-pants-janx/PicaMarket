@@ -33,6 +33,7 @@ function vdInit() {
   document.getElementById('vd-sidebar-user').textContent = stallName;
   vdPopulateProfile();
   vdLoadDirectory();
+  vdMaybeShowOnboarding();
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────────
@@ -42,7 +43,7 @@ function vdShowPage(p) {
   document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('#vd-sidebar .sidebar-item').forEach(el => el.classList.remove('active'));
   document.getElementById('vd-page-' + p).classList.add('active');
-  var map = { profile: 0, directory: 1 };
+  var map = { directory: 0, profile: 1 };
   if (map[p] !== undefined) {
     var nt = document.querySelectorAll('.nav-tab')[map[p]];
     if (nt) nt.classList.add('active');
@@ -177,6 +178,36 @@ async function vdLoadDirectory() {
       '<button class="btn primary dir-card-btn" onclick="vdOpenOrganiser(\'' + esc(org.slug) + '\')">View markets</button>' +
     '</div>'
   ).join('');
+}
+
+// ── ONBOARDING ───────────────────────────────────────────────────
+function vdMaybeShowOnboarding() {
+  var key = 'pm_ob_done_' + _vendorUser.id;
+  if (_vendorProfile.what_you_sell) { localStorage.setItem(key, '1'); return; }
+  if (localStorage.getItem(key)) return;
+  var el = document.getElementById('vd-onboarding');
+  if (el) { document.getElementById('ob-stall-name').value = _vendorProfile.stall_name || ''; el.style.display = 'flex'; }
+}
+
+async function vdFinishOnboarding() {
+  var stallName = document.getElementById('ob-stall-name').value.trim();
+  var whatYouSell = document.getElementById('ob-what-you-sell').value.trim();
+  if (stallName) {
+    await _sb.from('vendor_profiles').update({ stall_name: stallName, what_you_sell: whatYouSell || null, updated_at: new Date().toISOString() }).eq('user_id', _vendorUser.id);
+    _vendorProfile.stall_name = stallName;
+    _vendorProfile.what_you_sell = whatYouSell;
+    vdPopulateProfile();
+    document.getElementById('vd-nav-brand').textContent = stallName;
+    document.getElementById('vd-nav-user').textContent = stallName;
+    document.getElementById('vd-sidebar-user').textContent = stallName;
+  }
+  localStorage.setItem('pm_ob_done_' + _vendorUser.id, '1');
+  document.getElementById('vd-onboarding').style.display = 'none';
+}
+
+function vdSkipOnboarding() {
+  localStorage.setItem('pm_ob_done_' + _vendorUser.id, '1');
+  document.getElementById('vd-onboarding').style.display = 'none';
 }
 
 function vdOpenOrganiser(slug) {

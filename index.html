@@ -427,6 +427,44 @@
 <!-- TOAST -->
 <div id="toast"></div>
 
+<!-- ORGANISER ONBOARDING -->
+<div id="org-onboarding" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:none;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--bg);border-radius:16px;padding:32px;max-width:460px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+    <div id="ob-org-step-1">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:0.5rem">Step 1 of 2</div>
+      <h2 style="margin:0 0 0.5rem">Welcome to PicaMarket!</h2>
+      <p style="font-size:14px;color:var(--text2);margin:0 0 1.5rem">Thanks for signing up. Tell us a bit about your market or organisation so vendors know who you are.</p>
+      <div class="form-group">
+        <label class="form-label">Describe your market or organisation</label>
+        <textarea class="form-input" id="ob-org-desc" rows="4" placeholder="e.g. A monthly artisan market celebrating local crafts, food, and community." style="resize:vertical;min-height:90px"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:0.5rem">
+        <button class="btn" style="flex:1" onclick="obOrgSkip()">Skip for now</button>
+        <button class="btn primary" style="flex:2" onclick="obOrgNext()">Next</button>
+      </div>
+    </div>
+    <div id="ob-org-step-2" style="display:none">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:0.5rem">Step 2 of 2</div>
+      <h2 style="margin:0 0 0.5rem">Who can find you?</h2>
+      <p style="font-size:14px;color:var(--text2);margin:0 0 1.5rem">Choose whether vendors can discover you in the Market Directory.</p>
+      <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:10px;padding:16px;margin-bottom:1rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div>
+            <div style="font-size:14px;font-weight:500;color:var(--text)">Show in Vendor Directory</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px">Vendors can find and browse your markets</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="ob-org-public" checked><span class="slider"></span></label>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:1.25rem">You can change this any time in Account Settings.</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" style="flex:1" onclick="obOrgBack()">Back</button>
+        <button class="btn primary" style="flex:2" onclick="obOrgFinish()">Finish setup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- DOT MENU -->
 <div class="dot-menu-popup" id="dot-menu">
   <div class="dm-label" id="dot-menu-label"></div>
