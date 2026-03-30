@@ -167,7 +167,7 @@ async function vdLoadDirectory() {
     '<div class="dir-card">' +
       '<div class="dir-card-name">' + esc(org.market_name) + '</div>' +
       (org.description ? '<div class="dir-card-desc">' + esc(org.description) + '</div>' : '<div class="dir-card-desc" style="color:var(--text3)">No description provided.</div>') +
-      '<button class="btn primary dir-card-btn" onclick="vdOpenOrganiser(' + JSON.stringify(esc(org.slug)) + ')">View markets</button>' +
+      '<button class="btn primary dir-card-btn" onclick="vdOpenOrganiser(\'' + esc(org.slug) + '\')">View markets</button>' +
     '</div>'
   ).join('');
 }
