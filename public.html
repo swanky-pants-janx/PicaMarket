@@ -275,25 +275,23 @@ async function submitVendorForm() {
     marketStallTypes[mid] = sel ? sel.value : 'normal';
   });
 
-  // Turnstile verification
-  var tsToken = window.turnstile ? window.turnstile.getResponse() : null;
-  if (!tsToken) { alert('Please complete the security check before submitting.'); return; }
+  var _isDevEnv = window.location.hostname === 'localhost' || window.location.hostname.endsWith('.vercel.app');
+
+  // Turnstile verification (skipped on dev/preview)
+  if (!_isDevEnv) {
+    var tsToken = window.turnstile ? window.turnstile.getResponse() : null;
+    if (!tsToken) { alert('Please complete the security check before submitting.'); return; }
+    var verifyRes = await fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/verify-turnstile', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer sb_publishable_f64M7MFa88zOMuZ083v-lw_Ypgcyhx-'},
+      body: JSON.stringify({token: tsToken})
+    });
+    var verifyData = await verifyRes.json();
+    if (!verifyData.success) { alert('Security check failed. Please refresh the page and try again.'); return; }
+  }
 
   var btn = document.querySelector('#pub-apply .btn.primary');
   btn.textContent = 'Submitting...'; btn.disabled = true;
-
-  var verifyRes = await fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/verify-turnstile', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json','Authorization':'Bearer sb_publishable_f64M7MFa88zOMuZ083v-lw_Ypgcyhx-'},
-    body: JSON.stringify({token: tsToken})
-  });
-  var verifyData = await verifyRes.json();
-  if (!verifyData.success) {
-    btn.textContent = 'Submit application'; btn.disabled = false;
-    alert('Security check failed. Please refresh the page and try again.');
-    if (window.turnstile) window.turnstile.reset();
-    return;
-  }
 
   var blockedEmails=(coordinator.settings&&coordinator.settings.blocked_emails)||[];
   if(blockedEmails.includes(email.toLowerCase())){
