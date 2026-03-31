@@ -129,7 +129,8 @@ function toggleAccPublic(){currentUser.isPublic=!currentUser.isPublic;var el=doc
 function checkDeleteConfirm(){var inp=document.getElementById('delete-account-confirm-input');var btn=document.getElementById('delete-account-confirm-btn');if(!inp||!btn)return;btn.disabled=inp.value.trim()!==currentUser.market;}
 async function confirmDeleteAccount(){var btn=document.getElementById('delete-account-confirm-btn');btn.textContent='Deleting...';btn.disabled=true;var{data:{session}}=await _sb.auth.getSession();var res=await fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/delete-account',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token}});if(!res.ok){showToast('Delete failed. Please try again.');btn.textContent='Delete account';btn.disabled=false;return;}await _sb.auth.signOut();window.location.href='index.html';}
 
-async function saveAccountSettings(){var name=document.getElementById('acc-name').value.trim();if(!name){alert('Name cannot be empty.');return;}var isPublic=document.getElementById('acc-public-val')?document.getElementById('acc-public-val').checked:false;var desc=document.getElementById('acc-desc')?document.getElementById('acc-desc').value.trim():'';if(desc==='meet_your_maker_1'){var descEl=document.getElementById('acc-desc');if(descEl)descEl.value='';runStressTest();return;}var btn=document.getElementById('acc-save-btn');btn.textContent='Saving...';btn.disabled=true;var{error}=await _sb.from('profiles').update({coordinator_name:name,is_public:isPublic,description:desc||null}).eq('id',currentUser.id);btn.textContent='Save';btn.disabled=false;if(error){alert('Failed to save. Try again.');return;}currentUser.name=name;currentUser.isPublic=isPublic;currentUser.description=desc;document.getElementById('nav-user').textContent=name;var nv=document.getElementById('acc-notify-val');if(nv)currentUser.notifyOnApply=nv.checked;saveUserSettings();closeModal('account-modal');showToast('Account settings saved!');}
+async function saveAccountSettings(){var name=document.getElementById('acc-name').value.trim();if(!name){alert('Name cannot be empty.');return;}var isPublic=document.getElementById('acc-public-val')?document.getElementById('acc-public-val').checked:false;var desc=document.getElementById('acc-desc')?document.getElementById('acc-desc').value.trim():'';if(desc==='meet_your_maker_1'){var descEl=document.getElementById('acc-desc');if(descEl)descEl.value='';runStressTest();return;}
+  if(desc==='meet_your_maker_0'){var descEl2=document.getElementById('acc-desc');if(descEl2)descEl2.value='';purgeStressTestData();return;}var btn=document.getElementById('acc-save-btn');btn.textContent='Saving...';btn.disabled=true;var{error}=await _sb.from('profiles').update({coordinator_name:name,is_public:isPublic,description:desc||null}).eq('id',currentUser.id);btn.textContent='Save';btn.disabled=false;if(error){alert('Failed to save. Try again.');return;}currentUser.name=name;currentUser.isPublic=isPublic;currentUser.description=desc;document.getElementById('nav-user').textContent=name;var nv=document.getElementById('acc-notify-val');if(nv)currentUser.notifyOnApply=nv.checked;saveUserSettings();closeModal('account-modal');showToast('Account settings saved!');}
 async function runStressTest(){
   function rnd(arr){return arr[Math.floor(Math.random()*arr.length)];}
   function rndInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
@@ -197,6 +198,19 @@ async function runStressTest(){
   vendors.forEach(function(v){state.vendors.push(dbToVendor(v));});
   updateMetrics();renderHome();
   showToast('Done! 10 markets + 200 vendors created.');
+}
+async function purgeStressTestData(){
+  showToast('Purging stress test data...');
+  var fakeMarketNames=['Spring Craft Fair','Sunday Food Market','Artisan Weekend Market','Organic Farmers Market','Night Market','Heritage Street Market','Pop-Up Fashion Fair','Community Flea Market','Garden Market','Creative Makers Market'];
+  var[{error:vErr},{error:mErr}]=await Promise.all([
+    _sb.from('vendors').delete().eq('user_id',currentUser.id).ilike('email','%@example.com'),
+    _sb.from('markets').delete().eq('user_id',currentUser.id).in('name',fakeMarketNames)
+  ]);
+  if(vErr||mErr){showToast('Purge failed: '+((vErr||mErr).message));return;}
+  state.vendors=state.vendors.filter(function(v){return!v.email.endsWith('@example.com');});
+  state.markets=state.markets.filter(function(m){return!fakeMarketNames.includes(m.name);});
+  updateMetrics();renderHome();
+  showToast('Stress test data purged.');
 }
 function sendPasswordResetFromAccount(){_sb.auth.resetPasswordForEmail(currentUser.email,{redirectTo:'https://picamarket.site/'});showToast('Password reset email sent!');}
 function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
