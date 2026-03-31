@@ -216,6 +216,7 @@ async function runStressTest(){
   }
   markets.forEach(function(m){state.markets.push(dbToMarket(m));});
   vendors.forEach(function(v){state.vendors.push(dbToVendor(v));});
+  vendors.filter(function(_,i){return i%4===0;}).forEach(function(v){state.verifiedEmails.add(v.email.toLowerCase());});
   updateMetrics();renderHome();
   showToast('Done! 30 markets + 1000 vendors created.');
 }
