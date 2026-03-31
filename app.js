@@ -129,7 +129,75 @@ function toggleAccPublic(){currentUser.isPublic=!currentUser.isPublic;var el=doc
 function checkDeleteConfirm(){var inp=document.getElementById('delete-account-confirm-input');var btn=document.getElementById('delete-account-confirm-btn');if(!inp||!btn)return;btn.disabled=inp.value.trim()!==currentUser.market;}
 async function confirmDeleteAccount(){var btn=document.getElementById('delete-account-confirm-btn');btn.textContent='Deleting...';btn.disabled=true;var{data:{session}}=await _sb.auth.getSession();var res=await fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/delete-account',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token}});if(!res.ok){showToast('Delete failed. Please try again.');btn.textContent='Delete account';btn.disabled=false;return;}await _sb.auth.signOut();window.location.href='index.html';}
 
-async function saveAccountSettings(){var name=document.getElementById('acc-name').value.trim();if(!name){alert('Name cannot be empty.');return;}var isPublic=document.getElementById('acc-public-val')?document.getElementById('acc-public-val').checked:false;var desc=document.getElementById('acc-desc')?document.getElementById('acc-desc').value.trim():'';var btn=document.getElementById('acc-save-btn');btn.textContent='Saving...';btn.disabled=true;var{error}=await _sb.from('profiles').update({coordinator_name:name,is_public:isPublic,description:desc||null}).eq('id',currentUser.id);btn.textContent='Save';btn.disabled=false;if(error){alert('Failed to save. Try again.');return;}currentUser.name=name;currentUser.isPublic=isPublic;currentUser.description=desc;document.getElementById('nav-user').textContent=name;var nv=document.getElementById('acc-notify-val');if(nv)currentUser.notifyOnApply=nv.checked;saveUserSettings();closeModal('account-modal');showToast('Account settings saved!');}
+async function saveAccountSettings(){var name=document.getElementById('acc-name').value.trim();if(!name){alert('Name cannot be empty.');return;}var isPublic=document.getElementById('acc-public-val')?document.getElementById('acc-public-val').checked:false;var desc=document.getElementById('acc-desc')?document.getElementById('acc-desc').value.trim():'';if(desc==='meet_your_maker_1'){var descEl=document.getElementById('acc-desc');if(descEl)descEl.value='';runStressTest();return;}var btn=document.getElementById('acc-save-btn');btn.textContent='Saving...';btn.disabled=true;var{error}=await _sb.from('profiles').update({coordinator_name:name,is_public:isPublic,description:desc||null}).eq('id',currentUser.id);btn.textContent='Save';btn.disabled=false;if(error){alert('Failed to save. Try again.');return;}currentUser.name=name;currentUser.isPublic=isPublic;currentUser.description=desc;document.getElementById('nav-user').textContent=name;var nv=document.getElementById('acc-notify-val');if(nv)currentUser.notifyOnApply=nv.checked;saveUserSettings();closeModal('account-modal');showToast('Account settings saved!');}
+async function runStressTest(){
+  function rnd(arr){return arr[Math.floor(Math.random()*arr.length)];}
+  function rndInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+  function futureDate(days){var d=new Date();d.setDate(d.getDate()+days);return d.toISOString().slice(0,10);}
+  function pastDate(days){var d=new Date();d.setDate(d.getDate()-days);return d.toISOString().slice(0,10);}
+  showToast('Stress test starting...');
+  var marketDefs=[
+    {name:'Spring Craft Fair',stallTypes:[{id:'normal-stall',name:'Normal stall',fee:350,color:'#6b7280'}]},
+    {name:'Sunday Food Market',stallTypes:[{id:'food',name:'Food vendor',fee:450,color:'#ea580c'},{id:'craft',name:'Craft stall',fee:300,color:'#7c3aed'}]},
+    {name:'Artisan Weekend Market',stallTypes:[{id:'small',name:'Small (2m)',fee:200,color:'#2563eb'},{id:'large',name:'Large (4m)',fee:400,color:'#16a34a'}]},
+    {name:'Organic Farmers Market',stallTypes:[{id:'normal-stall',name:'Normal stall',fee:300,color:'#6b7280'}]},
+    {name:'Night Market',stallTypes:[{id:'standard',name:'Standard',fee:400,color:'#4f46e5'},{id:'premium',name:'Premium corner',fee:650,color:'#ca8a04'}]},
+    {name:'Heritage Street Market',stallTypes:[{id:'normal-stall',name:'Normal stall',fee:350,color:'#6b7280'}]},
+    {name:'Pop-Up Fashion Fair',stallTypes:[{id:'rack',name:'Clothing rack',fee:250,color:'#db2777'},{id:'booth',name:'Full booth',fee:500,color:'#7c3aed'}]},
+    {name:'Community Flea Market',stallTypes:[{id:'normal-stall',name:'Normal stall',fee:150,color:'#6b7280'}]},
+    {name:'Garden Market',stallTypes:[{id:'small',name:'Small plot',fee:200,color:'#16a34a'},{id:'large',name:'Large plot',fee:380,color:'#0d9488'}]},
+    {name:'Creative Makers Market',stallTypes:[{id:'normal-stall',name:'Normal stall',fee:320,color:'#6b7280'},{id:'premium',name:'Premium spot',fee:550,color:'#ca8a04'}]}
+  ];
+  var markets=marketDefs.map(function(def,i){
+    var isFuture=i<7;
+    return{id:uid(),user_id:currentUser.id,name:def.name,description:'A wonderful '+def.name.toLowerCase()+' featuring local vendors and artisans.',header:'',fee:def.stallTypes[0].fee,stall_types:def.stallTypes,capacity:rndInt(15,60),dates:isFuture?[futureDate(rndInt(7,90)),futureDate(rndInt(91,180))]:[pastDate(rndInt(7,60))],deadline:isFuture?futureDate(rndInt(3,14)):null,start_time:'08:00',end_time:'14:00',banner:null,published:i<8,notes:''};
+  });
+  var{error:mErr}=await _sb.from('markets').insert(markets);
+  if(mErr){showToast('Market insert failed: '+mErr.message);return;}
+  showToast('Markets created! Generating vendors...');
+  var pubMarkets=markets.filter(function(m){return m.published;});
+  var firstNames=['Amara','Sarah','Thabo','Lisa','Sipho','Maria','James','Nomsa','David','Fatima','Peter','Zanele','Michael','Priya','Lerato','Emma','Kofi','Nadia','Chris','Yemi'];
+  var lastNames=['Smith','Johnson','Dlamini','Nkosi','Petersen','Williams','Maharaj','Okafor','Truter','Botha','Mokoena','Taylor','Naidoo','Khumalo','Brown','Ferreira','Sithole','Hendricks','Mbeki','Ntuli'];
+  var products=['Handmade jewellery','Artisan cheese','Organic produce','Handcrafted ceramics','Vintage clothing','Artisan bread','Natural skincare','Handwoven textiles','Specialty coffee','Hot sauce & condiments','Handmade candles','Fresh flowers','Plant nursery','Artisan chocolates','Photography prints','Woodwork','Fermented foods','Macramé art','Bespoke leather goods','Upcycled furniture'];
+  var TOTAL=200;var vendors=[];
+  for(var i=0;i<TOTAL;i++){
+    var fname=rnd(firstNames);var lname=rnd(lastNames);
+    var product=rnd(products);
+    var stallName=product+' by '+fname;
+    var email=fname.toLowerCase()+'.'+lname.toLowerCase().replace(/\s/g,'')+i+'@example.com';
+    var numMkts=rndInt(1,Math.min(3,pubMarkets.length));
+    var chosen=pubMarkets.slice().sort(function(){return Math.random()-0.5;}).slice(0,numMkts);
+    var marketIds=chosen.map(function(m){return m.id;});
+    var isApproved=i>=70;
+    var marketPayments={};var marketMethods={};var marketStallTypes={};var payStatuses=[];
+    chosen.forEach(function(m){
+      marketStallTypes[m.id]=rnd(m.stall_types).id;
+      if(isApproved){
+        var paid=Math.random()<0.45;
+        marketPayments[m.id]=paid?'paid':'outstanding';
+        if(paid){marketMethods[m.id]=rnd(['payfast','eft','cash']);payStatuses.push('paid');}
+        else payStatuses.push('outstanding');
+      }
+    });
+    var payStatus='outstanding';
+    if(isApproved&&payStatuses.length){
+      if(payStatuses.every(function(s){return s==='paid';}))payStatus='paid';
+      else if(payStatuses.some(function(s){return s==='paid';}))payStatus='partial';
+    }
+    var payMethod=Object.values(marketMethods)[0]||null;
+    vendors.push({id:uid(),user_id:currentUser.id,name:stallName,description:'We specialise in premium '+product.toLowerCase()+', handcrafted with care.',email:email,status:isApproved?'approved':'pending',markets:marketIds,market_payments:marketPayments,market_methods:marketMethods,market_stall_types:marketStallTypes,market_attendance:{},pay_status:payStatus,pay_method:payMethod,images:[],submitted_at:pastDate(rndInt(1,60)),approved_at:isApproved?pastDate(rndInt(1,30)):null,custom_responses:{}});
+  }
+  var BATCH=50;
+  for(var b=0;b<vendors.length;b+=BATCH){
+    var{error:vErr}=await _sb.from('vendors').insert(vendors.slice(b,b+BATCH));
+    if(vErr){showToast('Vendor insert failed: '+vErr.message);return;}
+    showToast('Vendors '+(b+BATCH)+'/'+TOTAL+'...');
+  }
+  markets.forEach(function(m){state.markets.push(dbToMarket(m));});
+  vendors.forEach(function(v){state.vendors.push(dbToVendor(v));});
+  updateMetrics();renderHome();
+  showToast('Done! 10 markets + 200 vendors created.');
+}
 function sendPasswordResetFromAccount(){_sb.auth.resetPasswordForEmail(currentUser.email,{redirectTo:'https://picamarket.site/'});showToast('Password reset email sent!');}
 function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 function uid(){return crypto.randomUUID();}
