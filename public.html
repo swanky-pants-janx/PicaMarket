@@ -67,6 +67,10 @@
           <input type="text" id="hp-field" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
           <div class="cf-turnstile" data-sitekey="0x4AAAAAACvSECCEAevdD5i-" data-theme="auto" style="margin-top:0.5rem"></div>
           <button class="btn primary" style="width:100%;margin-top:0.75rem;padding:12px" onclick="submitVendorForm()">Submit application</button>
+          <div id="v-account-nudge" style="margin-top:0.75rem;padding:12px 14px;border-radius:10px;background:var(--blue-bg,rgba(59,130,246,0.08));border:0.5px solid var(--blue);font-size:13px;color:var(--text2);line-height:1.5">
+            <strong style="color:var(--text);display:block;margin-bottom:2px">Save your vendor details</strong>
+            <a href="vendor.html" style="color:var(--blue)">Create a free PicaMarket account</a> to have your stall info pre-filled automatically on future applications.
+          </div>
           <div id="v-success" style="display:none;margin-top:1rem;padding:12px;border-radius:8px;background:var(--green-bg);color:var(--green);font-size:13px;text-align:center;border:0.5px solid var(--green)">
             Application submitted! You'll be notified by email if approved.
           </div>
@@ -120,6 +124,8 @@ function tryVendorAutofill() {
     var saved = localStorage.getItem('pm_vendor_autofill');
     if (!saved) return;
     var data = JSON.parse(saved);
+    var nudge = document.getElementById('v-account-nudge');
+    if (nudge) nudge.style.display = 'none';
     var nameEl = document.getElementById('v-name');
     var descEl = document.getElementById('v-desc');
     var emailEl = document.getElementById('v-email');
