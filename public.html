@@ -306,6 +306,40 @@ async function submitVendorForm() {
     return;
   }
 
+  // Duplicate check: if a pending entry already exists for this email+coordinator, merge instead of inserting
+  var {data: existingVendors} = await _sb.from('vendors')
+    .select('id,markets,market_stall_types')
+    .eq('user_id', coordinator.id)
+    .ilike('email', email)
+    .eq('status', 'pending');
+  if (existingVendors && existingVendors.length > 0) {
+    var existing = existingVendors[0];
+    var existingMarkets = existing.markets || [];
+    var newMarkets = selectedMarkets.filter(function(mid){ return !existingMarkets.includes(mid); });
+    if (newMarkets.length === 0) {
+      // Exact duplicate — already applied to all these markets, silently succeed
+      btn.textContent = 'Submit application'; btn.disabled = false;
+      _vendorImages = []; renderVendorForm(coordinator.settings && coordinator.settings.form_fields || null);
+      document.querySelectorAll('.v-mkt-check').forEach(function(c){c.checked=false;c.closest('.market-select-card').classList.remove('selected');});
+      if (window.turnstile) window.turnstile.reset();
+      var s = document.getElementById('v-success'); s.style.display='block'; setTimeout(function(){s.style.display='none';},5000);
+      return;
+    }
+    // Same vendor applying to additional markets — merge into existing pending entry
+    var updatedMarkets = existingMarkets.concat(newMarkets);
+    var updatedStallTypes = Object.assign({}, existing.market_stall_types || {}, marketStallTypes);
+    var {error: mergeError} = await _sb.from('vendors')
+      .update({markets: updatedMarkets, market_stall_types: updatedStallTypes})
+      .eq('id', existing.id);
+    btn.textContent = 'Submit application'; btn.disabled = false;
+    if (mergeError) { alert('Something went wrong. Please try again.'); console.error(mergeError); return; }
+    _vendorImages = []; renderVendorForm(coordinator.settings && coordinator.settings.form_fields || null);
+    document.querySelectorAll('.v-mkt-check').forEach(function(c){c.checked=false;c.closest('.market-select-card').classList.remove('selected');});
+    if (window.turnstile) window.turnstile.reset();
+    var s2 = document.getElementById('v-success'); s2.style.display='block'; setTimeout(function(){s2.style.display='none';},5000);
+    return;
+  }
+
   var vendorId = crypto.randomUUID();
   var {error} = await _sb.from('vendors').insert({
     id: vendorId,
