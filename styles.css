@@ -3,8 +3,8 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',system-ui,sans-serif;min-height:100vh;background:var(--bg2);color:var(--text);transition:background 0.2s,color 0.2s;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 
-body{--bg:#ffffff;--bg2:#f6f7ed;--bg3:#eaeade;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.16);--text:#1a1a1a;--text2:#6b6b6b;--text3:#aaa9a0;--blue:#185fa5;--blue-bg:#e8f1fb;--blue-text:#0c3d6e;--green:#2a6610;--green-bg:#e6f3dc;--green-text:#163808;--amber:#7a4500;--amber-bg:#fdf0d5;--amber-text:#5a3300;--red:#a83030;--red-bg:#fde8e8;--red-text:#6b1414;--teal:#0a5c46;--teal-bg:#ddf5ee;--teal-text:#063d2e;--nav-h:52px;--bottom-h:60px}
-body.dark{--bg:#1c1c1a;--bg2:#131310;--bg3:#252520;--border:rgba(255,255,255,0.09);--border2:rgba(255,255,255,0.17);--text:#e0e0d8;--text2:#87877e;--text3:#4e4e48;--blue:#5ba3e0;--blue-bg:#0f2235;--blue-text:#a8d0f5;--green:#6ab54e;--green-bg:#0e1f0a;--green-text:#9dd47e;--amber:#d4943a;--amber-bg:#1f1500;--amber-text:#f0c070;--red:#d96060;--red-bg:#200a0a;--red-text:#f0a0a0;--teal:#3cbf9a;--teal-bg:#061a13;--teal-text:#7ddfc0}
+body{--bg:#ffffff;--bg2:#f6f7ed;--bg3:#eaeade;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.16);--text:#1a1a1a;--text2:#6b6b6b;--text3:#aaa9a0;--blue:#5a8a28;--blue-bg:#edf5e0;--blue-text:#2d5010;--green:#2a6610;--green-bg:#e6f3dc;--green-text:#163808;--amber:#7a4500;--amber-bg:#fdf0d5;--amber-text:#5a3300;--red:#a83030;--red-bg:#fde8e8;--red-text:#6b1414;--teal:#0a5c46;--teal-bg:#ddf5ee;--teal-text:#063d2e;--nav-h:52px;--bottom-h:60px}
+body.dark{--bg:#1c1c1a;--bg2:#131310;--bg3:#252520;--border:rgba(255,255,255,0.09);--border2:rgba(255,255,255,0.17);--text:#e0e0d8;--text2:#87877e;--text3:#4e4e48;--blue:#7ab840;--blue-bg:#112008;--blue-text:#b8e080;--green:#6ab54e;--green-bg:#0e1f0a;--green-text:#9dd47e;--amber:#d4943a;--amber-bg:#1f1500;--amber-text:#f0c070;--red:#d96060;--red-bg:#200a0a;--red-text:#f0a0a0;--teal:#3cbf9a;--teal-bg:#061a13;--teal-text:#7ddfc0}
 
 /* ── AUTH ──────────────────────────────────────────────────────── */
 .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;background:var(--bg2)}
@@ -189,7 +189,7 @@ input[type=checkbox]{width:17px;height:17px;cursor:pointer;accent-color:var(--te
 .form-group{margin-bottom:1rem}
 .form-label{font-size:13px;font-weight:500;margin-bottom:6px;display:block;color:var(--text)}
 .form-input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:16px;background:var(--bg);color:var(--text);font-family:inherit;transition:border-color 0.15s}
-.form-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,95,165,0.15)}
+.form-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(90,138,40,0.15)}
 textarea.form-input{min-height:80px;resize:vertical;font-size:15px}
 select.form-input{font-size:14px}
 .form-input::placeholder{color:var(--text3)}
@@ -293,7 +293,7 @@ select.form-input{font-size:14px}
 
 /* Better focus rings */
 .btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(24,95,165,0.25)}
-.search-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,95,165,0.12)}
+.search-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(90,138,40,0.12)}
 
 /* Custom scrollbars */
 *::-webkit-scrollbar{width:5px;height:5px}
