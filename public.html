@@ -281,20 +281,9 @@ async function submitVendorForm() {
     marketStallTypes[mid] = sel ? sel.value : 'normal';
   });
 
-  var _isDevEnv = window.location.hostname === 'localhost' || window.location.hostname.endsWith('.vercel.app');
-
-  // Turnstile verification (skipped on dev/preview)
-  if (!_isDevEnv) {
-    var tsToken = window.turnstile ? window.turnstile.getResponse() : null;
-    if (!tsToken) { alert('Please complete the security check before submitting.'); return; }
-    var verifyRes = await fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/verify-turnstile', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','Authorization':'Bearer sb_publishable_f64M7MFa88zOMuZ083v-lw_Ypgcyhx-'},
-      body: JSON.stringify({token: tsToken})
-    });
-    var verifyData = await verifyRes.json();
-    if (!verifyData.success) { alert('Security check failed. Please refresh the page and try again.'); return; }
-  }
+  // Grab Turnstile token to send server-side (null on dev/localhost is OK — server skips if no secret configured)
+  var tsToken = window.turnstile ? window.turnstile.getResponse() : null;
+  if (!tsToken && window.location.hostname !== 'localhost') { alert('Please complete the security check before submitting.'); return; }
 
   var btn = document.querySelector('#pub-apply .btn.primary');
   btn.textContent = 'Submitting...'; btn.disabled = true;
@@ -315,6 +304,7 @@ async function submitVendorForm() {
     markets: selectedMarkets,
     market_stall_types: marketStallTypes,
     images: _vendorImages.slice(),
+    turnstile_token: tsToken || undefined,
   };
   if (customFields.length && Object.keys(customResponses).length) submitPayload.custom_responses = customResponses;
 
@@ -328,15 +318,6 @@ async function submitVendorForm() {
   btn.textContent = 'Submit application'; btn.disabled = false;
   if (submitRes.status === 429) { alert(submitData.message || 'You have submitted recently. Please wait a few minutes before trying again.'); return; }
   if (!submitRes.ok) { alert('Something went wrong. Please try again.'); console.error(submitData); return; }
-
-  // Fire notification for new inserts only (duplicates/merges don't need a new notification)
-  if (submitData.action === 'inserted') {
-    fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/notify-vendor-submission', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','Authorization':'Bearer sb_publishable_f64M7MFa88zOMuZ083v-lw_Ypgcyhx-'},
-      body: JSON.stringify({vendor_id: submitData.id})
-    }).catch(function(err){ console.error('Notify error:', err); });
-  }
 
   _vendorImages=[];
   renderVendorForm(coordinator.settings&&coordinator.settings.form_fields||null);

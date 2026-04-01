@@ -9,13 +9,21 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
   try {
-    const { user_id, type } = await req.json()
-    if (!user_id) return new Response('Missing user_id', { status: 400 })
+    // Authenticate via JWT
+    const authHeader = req.headers.get('Authorization') || ''
+    const token = authHeader.replace('Bearer ', '')
+    if (!token) return new Response('Unauthorized', { status: 401, headers: corsHeaders })
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
+
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token)
+    if (authError || !authUser) return new Response('Unauthorized', { status: 401, headers: corsHeaders })
+
+    const { type } = await req.json()
+    const user_id = authUser.id
 
     const apiKey = Deno.env.get('RESEND_API_KEY')
     const from = Deno.env.get('RESEND_FROM') || 'PicaMarket <noreply@picamarket.site>'
