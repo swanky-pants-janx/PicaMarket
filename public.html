@@ -326,6 +326,7 @@ async function submitVendorForm() {
   var submitData = await submitRes.json();
 
   btn.textContent = 'Submit application'; btn.disabled = false;
+  if (submitRes.status === 429) { alert(submitData.message || 'You have submitted recently. Please wait a few minutes before trying again.'); return; }
   if (!submitRes.ok) { alert('Something went wrong. Please try again.'); console.error(submitData); return; }
 
   // Fire notification for new inserts only (duplicates/merges don't need a new notification)

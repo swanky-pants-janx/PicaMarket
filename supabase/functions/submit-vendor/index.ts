@@ -23,6 +23,28 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
 
+    // ── Rate limiting: 3 submissions per email per coordinator per 10 minutes ──
+    const rateLimitKey = `submit-vendor:${email.toLowerCase()}:${coordinator_id}`
+    const windowStart = new Date(Date.now() - 10 * 60 * 1000).toISOString()
+
+    const { count: recentCount } = await supabase
+      .from('rate_limits')
+      .select('*', { count: 'exact', head: true })
+      .eq('key', rateLimitKey)
+      .gte('created_at', windowStart)
+
+    if ((recentCount ?? 0) >= 3) {
+      return new Response(JSON.stringify({
+        error: 'rate_limited',
+        message: 'You have submitted recently. Please wait a few minutes before trying again.'
+      }), {
+        status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
+    // Log this submission attempt
+    await supabase.from('rate_limits').insert({ key: rateLimitKey })
+
     // Check for existing pending entry with same email for this coordinator (service role bypasses RLS)
     const { data: existing } = await supabase
       .from('vendors')
