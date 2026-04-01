@@ -25,9 +25,11 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Server-side Turnstile verification
+    // Server-side Turnstile verification (skip on Vercel preview deployments)
+    const requestOrigin = req.headers.get('Origin') || ''
+    const isPreview = requestOrigin.endsWith('.vercel.app') || requestOrigin.startsWith('http://localhost')
     const turnstileSecret = Deno.env.get('TURNSTILE_SECRET_KEY')
-    if (turnstileSecret) {
+    if (turnstileSecret && !isPreview) {
       if (!turnstile_token) {
         return new Response(JSON.stringify({ error: 'Missing CAPTCHA token' }), {
           status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
