@@ -1,11 +1,17 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+const ALLOWED_ORIGINS = ['https://picamarket.site', 'https://www.picamarket.site']
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('Origin') || ''
+  const allowed = ALLOWED_ORIGINS.includes(origin) || origin.endsWith('.vercel.app') || origin.startsWith('http://localhost')
+  return {
+    'Access-Control-Allow-Origin': allowed ? origin : ALLOWED_ORIGINS[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  }
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req)
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
   try {
@@ -66,6 +72,23 @@ Deno.serve(async (req) => {
 
     // Log this submission attempt
     await supabase.from('rate_limits').insert({ key: rateLimitKey })
+
+    // Check if this email is blocked by the coordinator
+    const { data: coordProfile } = await supabase
+      .from('profiles')
+      .select('settings')
+      .eq('id', coordinator_id)
+      .single()
+
+    const blockedEmails: string[] = coordProfile?.settings?.blocked_emails || []
+    if (blockedEmails.includes(email.toLowerCase())) {
+      return new Response(JSON.stringify({
+        error: 'blocked',
+        message: 'This email address is not able to submit applications. Please contact the market coordinator.'
+      }), {
+        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
 
     // Check for existing pending entry with same email for this coordinator (service role bypasses RLS)
     const { data: existing } = await supabase

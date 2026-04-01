@@ -317,6 +317,7 @@ async function submitVendorForm() {
 
   btn.textContent = 'Submit application'; btn.disabled = false;
   if (submitRes.status === 429) { alert(submitData.message || 'You have submitted recently. Please wait a few minutes before trying again.'); return; }
+  if (submitRes.status === 403 && submitData.error === 'blocked') { alert(submitData.message || 'This email address is not able to submit applications.'); return; }
   if (!submitRes.ok) { alert('Something went wrong. Please try again.'); console.error(submitData); return; }
 
   _vendorImages=[];
