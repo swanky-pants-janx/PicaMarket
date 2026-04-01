@@ -283,7 +283,7 @@ async function submitVendorForm() {
 
   // Grab Turnstile token to send server-side (null on dev/localhost is OK — server skips if no secret configured)
   var tsToken = window.turnstile ? window.turnstile.getResponse() : null;
-  if (!tsToken && window.location.hostname !== 'localhost') { alert('Please complete the security check before submitting.'); return; }
+  if (!tsToken && window.location.hostname !== 'localhost' && !window.location.hostname.endsWith('.vercel.app')) { alert('Please complete the security check before submitting.'); return; }
 
   var btn = document.querySelector('#pub-apply .btn.primary');
   btn.textContent = 'Submitting...'; btn.disabled = true;
