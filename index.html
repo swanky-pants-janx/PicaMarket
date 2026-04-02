@@ -115,7 +115,7 @@
       <div class="nav-tab" onclick="showPage('approved')">Approved Vendors<span class="nav-notif-dot" data-for="approved" style="display:none"></span></div>
       <div class="nav-tab" onclick="showPage('markets')">Markets</div>
       <div class="nav-tab" onclick="showPage('form-builder')">Form Builder</div>
-      <div class="nav-tab" onclick="showPage('past-vendors')">Past Vendors</div>
+      <div class="nav-tab" onclick="showPage('history')">History</div>
     </div>
     <div class="nav-right">
       <span class="nav-user" id="nav-user"></span>
@@ -136,7 +136,7 @@
     <button class="bottom-nav-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Vendors</span><span class="nav-notif-dot" data-for="approved" style="display:none"></span></button>
     <button class="bottom-nav-item" onclick="showPage('markets')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Markets</span></button>
     <button class="bottom-nav-item" onclick="showPage('form-builder')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M17 5h1a2 2 0 012 2v13a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h1"/><path d="M9 12h6M9 16h4"/></svg><span>Form</span></button>
-    <button class="bottom-nav-item" onclick="showPage('past-vendors')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg><span>History</span></button>
+    <button class="bottom-nav-item" onclick="showPage('history')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg><span>History</span></button>
     <button class="bottom-nav-item" onclick="showPage('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Settings</span></button>
   </nav>
 
@@ -146,7 +146,7 @@
     <button class="sidebar-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Approved Vendors</span><span class="nav-notif-dot" data-for="approved" style="display:none"></span></button>
     <button class="sidebar-item" onclick="showPage('markets')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Markets</span></button>
     <button class="sidebar-item" onclick="showPage('form-builder')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M17 5h1a2 2 0 012 2v13a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h1"/><path d="M9 12h6M9 16h4"/></svg><span>Form Builder</span></button>
-    <button class="sidebar-item" onclick="showPage('past-vendors')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg><span>Past Vendors</span></button>
+    <button class="sidebar-item" onclick="showPage('history')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg><span>History</span></button>
     <div class="sidebar-spacer"></div>
     <div class="sidebar-user" id="sidebar-user"></div>
     <div class="sidebar-divider"></div>
@@ -426,24 +426,37 @@
     </div>
   </div>
 
-  <div id="page-past-vendors" class="page">
-    <div class="page-banner" style="background:var(--bg);border:0.5px solid var(--border)"><div class="page-banner-icon">&#9679;</div><div><div class="page-banner-title">Past Vendors</div><div class="page-banner-desc">All vendors who have been approved for your markets. Click a vendor name to view their full market history and payment record.</div></div></div>
+  <div id="page-history" class="page">
+    <div class="page-banner" style="background:var(--bg);border:0.5px solid var(--border)"><div class="page-banner-icon">&#9679;</div><div><div class="page-banner-title">History</div><div class="page-banner-desc">Archived vendor and market records. Archive a market from the Markets page to preserve its data here permanently.</div></div></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px" class="page-actions">
-      <h2 style="margin:0">Past Vendors</h2>
-    </div>
-    <div class="card">
-      <div class="toolbar">
-        <input class="search-input" type="text" placeholder="Search vendors..." oninput="renderPastVendors(this.value)">
+      <h2 style="margin:0">History</h2>
+      <div class="tabs-inner" style="margin:0">
+        <button id="hist-tab-vendors" class="tab-inner active" onclick="renderHistory('vendors')">Vendor History</button>
+        <button id="hist-tab-markets" class="tab-inner" onclick="renderHistory('markets')">Market History</button>
       </div>
-      <table class="vendor-table desktop-table"><thead><tr><th>Vendor</th><th>Markets</th><th>Last market</th></tr></thead><tbody id="pv-tbody"></tbody></table>
-      <div class="mobile-cards" id="pv-cards"></div>
-      <div id="pv-empty" class="empty-state" style="display:none">No approved vendors yet</div>
+    </div>
+    <div id="hist-vendors-section">
+      <div class="card">
+        <div class="toolbar">
+          <input class="search-input" type="text" placeholder="Search vendors..." oninput="renderVendorHistory(this.value)">
+        </div>
+        <table class="vendor-table desktop-table"><thead><tr><th>Vendor</th><th>Markets attended</th><th>Last market</th></tr></thead><tbody id="hist-v-tbody"></tbody></table>
+        <div class="mobile-cards" id="hist-v-cards"></div>
+        <div id="hist-v-empty" class="empty-state" style="display:none">No archived vendor history yet. Archive a market to start building history.</div>
+      </div>
+    </div>
+    <div id="hist-markets-section" style="display:none">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
+        <button class="btn small danger" onclick="purgeHistory()">Purge All History</button>
+      </div>
+      <div id="hist-m-list"></div>
+      <div id="hist-m-empty" class="empty-state" style="display:none">No archived markets yet. Archive a market from the Markets page to preserve its data here.</div>
     </div>
   </div>
 
   <div id="page-vendor-detail" class="page">
     <div class="vd-topbar no-print">
-      <button class="back-btn" style="margin:0" onclick="showPage('past-vendors')">&#8592; Back to Past Vendors</button>
+      <button class="back-btn" style="margin:0" onclick="showPage('history')">&#8592; Back to History</button>
       <button class="btn" onclick="window.print()">&#128438; Print / Download PDF</button>
     </div>
     <div id="vd-content"></div>
