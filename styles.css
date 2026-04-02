@@ -19,8 +19,9 @@ body.dark{--bg:#1c1c1a;--bg2:#131310;--bg3:#252520;--border:rgba(255,255,255,0.0
 
 /* ── NAV ───────────────────────────────────────────────────────── */
 .nav{background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;height:var(--nav-h);position:sticky;top:0;z-index:100}
-.nav-brand{font-size:15px;font-weight:600;letter-spacing:-0.02em;margin-right:1.5rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;color:var(--text)}
-.nav-brand span{color:var(--blue)}
+.nav-brand{font-size:15px;font-weight:600;letter-spacing:-0.02em;margin-right:1.5rem;color:var(--text);display:flex;align-items:center;min-width:0;max-width:300px}
+.nav-brand span{color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.nav-brand .nav-brand-suffix{white-space:nowrap;flex-shrink:0;color:var(--text)}
 .nav-tabs{display:flex;height:100%;flex:1}
 .nav-tab{padding:0 1rem;height:100%;display:flex;align-items:center;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);white-space:nowrap;transition:color 0.15s;position:relative}
 .nav-tab:hover{color:var(--text)}
@@ -345,7 +346,7 @@ select.form-input{font-size:14px}
 @media(max-width:767px){
   .nav-tabs,.nav-right{display:none}
   .nav{padding:0 1rem}
-  .nav-brand{max-width:calc(100vw - 140px);font-size:13px}
+  .nav-brand{max-width:calc(100vw - 140px);font-size:13px;max-width:none}
   .nav-mobile-right{display:flex;align-items:center;gap:8px;margin-left:auto}
   .bottom-nav{display:flex}
   .metric-grid{grid-template-columns:1fr 1fr;gap:8px}
@@ -370,7 +371,7 @@ select.form-input{font-size:14px}
 }
 @media(min-width:768px) and (max-width:1023px){
   .metric-grid{grid-template-columns:repeat(2,1fr)}
-  .nav-brand{max-width:160px}
+  .nav-brand{max-width:180px}
 }
 /* ── HOME PAGE ──────────────────────────────────────────────────── */
 .home-hero{background:linear-gradient(135deg,var(--blue-bg) 0%,var(--bg) 100%);border:1px solid var(--blue);border-radius:12px;padding:1.75rem 2rem;margin-bottom:1.25rem}
