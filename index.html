@@ -40,6 +40,18 @@
   .cal-day.today-cell.has-market .day-num{background:var(--blue);color:#fff}
   .cal-dot{display:none;width:5px;height:5px;border-radius:50%;background:var(--blue);margin-top:3px}
   .cal-day.today-cell .cal-dot{background:#fff;opacity:0.8}
+  .vd-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
+  @media print{
+    .nav,.bottom-nav,.sidebar,.no-print{display:none!important}
+    .dashboard-main{margin:0!important;padding:1rem!important}
+    .page{display:none!important}
+    #page-vendor-detail{display:block!important}
+    .card{border:1px solid #ccc!important;box-shadow:none!important;break-inside:avoid}
+    .vendor-table{width:100%}
+    .mobile-cards{display:none!important}
+    .desktop-table{display:table!important}
+    body{background:#fff!important;color:#000!important}
+  }
 </style>
 </head>
 <body>
@@ -430,7 +442,10 @@
   </div>
 
   <div id="page-vendor-detail" class="page">
-    <button class="back-btn" onclick="showPage('past-vendors')">&#8592; Back to Past Vendors</button>
+    <div class="vd-topbar no-print">
+      <button class="back-btn" style="margin:0" onclick="showPage('past-vendors')">&#8592; Back to Past Vendors</button>
+      <button class="btn" onclick="window.print()">&#128438; Print / Download PDF</button>
+    </div>
     <div id="vd-content"></div>
   </div>
 
