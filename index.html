@@ -40,6 +40,18 @@
   .cal-day.today-cell.has-market .day-num{background:var(--blue);color:#fff}
   .cal-dot{display:none;width:5px;height:5px;border-radius:50%;background:var(--blue);margin-top:3px}
   .cal-day.today-cell .cal-dot{background:#fff;opacity:0.8}
+  .vd-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
+  @media print{
+    .nav,.bottom-nav,.sidebar,.no-print{display:none!important}
+    .dashboard-main{margin:0!important;padding:1rem!important}
+    .page{display:none!important}
+    #page-vendor-detail{display:block!important}
+    .card{border:1px solid #ccc!important;box-shadow:none!important;break-inside:avoid}
+    .vendor-table{width:100%}
+    .mobile-cards{display:none!important}
+    .desktop-table{display:table!important}
+    body{background:#fff!important;color:#000!important}
+  }
 </style>
 </head>
 <body>
@@ -47,7 +59,12 @@
 <div id="auth-screen" class="auth-wrap">
   <div class="auth-card">
     <div class="auth-logo"><img src="PicaMarketLogo.png" alt="PicaMarket" style="max-width:180px;height:auto"></div>
-    <div class="auth-sub">Market runner dashboard</div>
+    <div id="account-type-toggle" onclick="switchAccountType(_accountType==='organiser'?'vendor':'organiser')" style="display:flex;align-items:center;margin-bottom:1.25rem;background:var(--surface2);border:0.5px solid var(--border);border-radius:999px;padding:3px;cursor:pointer;position:relative;user-select:none">
+      <div id="at-pill" style="position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);background:var(--blue);border-radius:999px;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:transform 0.2s ease"></div>
+      <div id="at-organiser" style="flex:1;padding:7px 12px;font-size:12px;font-weight:600;text-align:center;position:relative;color:#fff;transition:color 0.2s">Market Organiser</div>
+      <div id="at-vendor" style="flex:1;padding:7px 12px;font-size:12px;font-weight:600;text-align:center;position:relative;color:var(--text2);transition:color 0.2s">Vendor</div>
+    </div>
+    <div id="auth-type-desc" style="font-size:12px;color:var(--text3);margin:-0.5rem 0 1rem;text-align:center">Run and manage your markets, vendors, and applications</div>
     <div class="auth-tabs">
       <div class="auth-tab active" onclick="switchAuthTab('login')">Log in</div>
       <div class="auth-tab" onclick="switchAuthTab('register')">Create account</div>
@@ -66,8 +83,13 @@
       <p style="font-size:12px;color:var(--text2);text-align:center;margin-top:1rem"><span style="color:var(--blue);cursor:pointer" onclick="switchAuthTab('login')">Back to log in</span></p>
     </div>
     <div id="auth-register" style="display:none">
-      <div class="form-group"><label class="form-label">Market name *</label><input class="form-input" id="reg-market" type="text" placeholder="e.g. Picnic & Thrift"></div>
-      <div class="form-group"><label class="form-label">Your name *</label><input class="form-input" id="reg-name" type="text" placeholder="e.g. Sarah"></div>
+      <div id="reg-organiser-fields">
+        <div class="form-group"><label class="form-label">Business Name *</label><input class="form-input" id="reg-market" type="text" placeholder="e.g. Picnic & Thrift"></div>
+        <div class="form-group"><label class="form-label">Your name *</label><input class="form-input" id="reg-name" type="text" placeholder="e.g. Sarah"></div>
+      </div>
+      <div id="reg-vendor-fields" style="display:none">
+        <div class="form-group"><label class="form-label">Stall name *</label><input class="form-input" id="reg-stall" type="text" placeholder="e.g. Sunshine Bakes"></div>
+      </div>
       <div class="form-group"><label class="form-label">Email *</label><input class="form-input" id="reg-email" type="email" placeholder="you@example.com"></div>
       <div class="form-group"><label class="form-label">Password *</label><input class="form-input" id="reg-password" type="password" placeholder="At least 8 characters" oninput="updatePwStrength('reg-password','reg-pw-strength')"><div class="pw-strength-wrap" id="reg-pw-strength" style="display:none"><div class="pw-strength-bar"><div class="pw-strength-fill" id="reg-pw-fill"></div></div><span class="pw-strength-label" id="reg-pw-label"></span></div></div>
       <div class="form-group"><label class="form-label">Confirm password *</label><input class="form-input" id="reg-confirm" type="password" placeholder="Repeat password"></div>
@@ -92,7 +114,6 @@
       <div class="nav-tab" onclick="showPage('approval')">Vendor Approval<span class="nav-notif-dot" data-for="approval" style="display:none"></span></div>
       <div class="nav-tab" onclick="showPage('approved')">Approved Vendors<span class="nav-notif-dot" data-for="approved" style="display:none"></span></div>
       <div class="nav-tab" onclick="showPage('markets')">Markets</div>
-      <div class="nav-tab" onclick="showPage('form-builder')">Form Builder</div>
     </div>
     <div class="nav-right">
       <span class="nav-user" id="nav-user"></span>
@@ -112,7 +133,6 @@
     <button class="bottom-nav-item" onclick="showPage('approval')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Approval</span><span class="nav-notif-dot" data-for="approval" style="display:none"></span></button>
     <button class="bottom-nav-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Vendors</span><span class="nav-notif-dot" data-for="approved" style="display:none"></span></button>
     <button class="bottom-nav-item" onclick="showPage('markets')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Markets</span></button>
-    <button class="bottom-nav-item" onclick="showPage('form-builder')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M17 5h1a2 2 0 012 2v13a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h1"/><path d="M9 12h6M9 16h4"/></svg><span>Form</span></button>
     <button class="bottom-nav-item" onclick="showPage('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Settings</span></button>
   </nav>
 
@@ -121,7 +141,6 @@
     <button class="sidebar-item" onclick="showPage('approval')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>Vendor Approval</span><span class="nav-notif-dot" data-for="approval" style="display:none"></span></button>
     <button class="sidebar-item" onclick="showPage('approved')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>Approved Vendors</span><span class="nav-notif-dot" data-for="approved" style="display:none"></span></button>
     <button class="sidebar-item" onclick="showPage('markets')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Markets</span></button>
-    <button class="sidebar-item" onclick="showPage('form-builder')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M17 5h1a2 2 0 012 2v13a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h1"/><path d="M9 12h6M9 16h4"/></svg><span>Form Builder</span></button>
     <div class="sidebar-spacer"></div>
     <div class="sidebar-user" id="sidebar-user"></div>
     <div class="sidebar-divider"></div>
@@ -155,7 +174,7 @@
         <div class="home-card-title">Markets</div>
         <div class="home-card-desc">Create and manage your markets</div>
       </div>
-      <div class="home-card" onclick="showPage('form-builder')">
+      <div class="home-card" onclick="showPage('settings');showSettingsSec('form-builder')">
         <div class="home-card-icon"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M17 5h1a2 2 0 012 2v13a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h1"/><path d="M9 12h6M9 16h4"/></svg></div>
         <div class="home-card-title">Form Builder</div>
         <div class="home-card-desc">Customise the vendor application form</div>
@@ -260,14 +279,6 @@
     </div>
   </div>
 
-  <div id="page-form-builder" class="page">
-    <div class="page-banner" style="background:var(--bg);border:0.5px solid var(--border)"><div class="page-banner-icon">&#9998;</div><div><div class="page-banner-title">Form Builder</div><div class="page-banner-desc">Add custom questions to your vendor application form. Vendors will see these fields when they apply. Responses appear in the expanded vendor row on the Vendor Approval page. Field types: <strong>Short text</strong>, <strong>Long text</strong>, <strong>Single choice</strong> (radio), <strong>Multiple choice</strong> (checkboxes), <strong>Dropdown</strong>. Mark fields as required to prevent submission without an answer.</div></div></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px">
-      <h2 style="margin:0">Application Form</h2>
-      <button class="btn primary" onclick="openAddField()">+ Add field</button>
-    </div>
-    <div id="fb-fields-container"></div>
-  </div>
 
   <div id="page-public" class="page" style="padding:0;max-width:100%">
     <div style="background:var(--bg2);min-height:calc(100vh - var(--nav-h))">
@@ -301,8 +312,10 @@
         </div>
         <div class="settings-nav-group">
           <span class="settings-nav-label">Market</span>
-          <button class="settings-nav-item" id="snav-payment" onclick="showSettingsSec('payment')">Payment settings</button>
+          <button class="settings-nav-item" id="snav-profile" onclick="showSettingsSec('profile')">Profile</button>
+          <button class="settings-nav-item" id="snav-form-builder" onclick="showSettingsSec('form-builder')">Form Builder</button>
           <button class="settings-nav-item" id="snav-email" onclick="showSettingsSec('email')">Email templates</button>
+          <button class="settings-nav-item" id="snav-history" onclick="showSettingsSec('history')">History</button>
         </div>
         <div class="settings-nav-group">
           <span class="settings-nav-label">Vendors</span>
@@ -311,6 +324,7 @@
         <div class="settings-nav-group">
           <span class="settings-nav-label">Account</span>
           <button class="settings-nav-item" id="snav-account" onclick="showSettingsSec('account')">Account settings</button>
+          <button class="settings-nav-item" id="snav-payment" onclick="showSettingsSec('payment')">Payment settings</button>
         </div>
       </aside>
       <div class="settings-body">
@@ -329,6 +343,19 @@
             <div><div class="settings-row-title">Market calendar</div><div class="settings-row-sub">Show or hide the calendar widget on the home dashboard</div></div>
             <label class="toggle-switch" onclick="toggleCalendar();event.preventDefault()"><input type="checkbox" id="sp-cal-val" tabindex="-1" checked><span class="toggle-track"></span></label>
           </div>
+        </div>
+        <div class="settings-sec" id="ssec-profile">
+          <h3 class="settings-sec-title">Profile</h3>
+          <p class="settings-sec-desc">Control how your market appears in the vendor-facing directory</p>
+          <div class="form-group" id="acc-desc-group">
+            <label class="form-label">Market / Business Description <span style="font-weight:400;color:var(--text3)">(optional)</span></label>
+            <textarea class="form-input" id="acc-desc" rows="3" placeholder="Briefly describe your market — vendors will see this in the directory." style="resize:vertical;min-height:72px"></textarea>
+          </div>
+          <div class="settings-row" style="margin-bottom:1.25rem;cursor:pointer" onclick="toggleAccPublic()">
+            <div><div class="settings-row-title">Make Market Public</div><div class="settings-row-sub">Allow vendors to discover your market in the vendor-facing directory</div></div>
+            <label class="toggle-switch" onclick="event.preventDefault()"><input type="checkbox" id="acc-public-val" tabindex="-1"><span class="toggle-track"></span></label>
+          </div>
+          <button class="btn primary" id="profile-save-btn" onclick="saveAccountSettings()">Save</button>
         </div>
         <div class="settings-sec" id="ssec-payment">
           <h3 class="settings-sec-title">Payment settings</h3>
@@ -352,6 +379,42 @@
           </div>
           <div class="form-group"><label class="form-label">Account type</label><select class="form-input" id="bank-acc-type"><option value="">Select...</option><option value="Cheque">Cheque / Current</option><option value="Savings">Savings</option></select></div>
           <button class="btn primary" id="pf-save-btn" onclick="savePaymentSettings()">Save payment settings</button>
+        </div>
+        <div class="settings-sec" id="ssec-form-builder">
+          <h3 class="settings-sec-title">Form Builder</h3>
+          <p class="settings-sec-desc">Add custom questions to your vendor application form. Vendors will see these fields when they apply. Responses appear in the expanded vendor row on the Vendor Approval page.</p>
+          <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
+            <button class="btn primary" onclick="openAddField()">+ Add field</button>
+          </div>
+          <div id="fb-fields-container"></div>
+        </div>
+        <div class="settings-sec" id="ssec-history">
+          <h3 class="settings-sec-title">History</h3>
+          <p class="settings-sec-desc">Archived vendor and market records. Archive a market from the Markets page to preserve its data here permanently.</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px">
+            <div id="hist-type-toggle" onclick="renderHistory(_historyTab==='vendors'?'markets':'vendors')" style="display:flex;align-items:center;background:var(--surface2);border:0.5px solid var(--border);border-radius:999px;padding:3px;cursor:pointer;position:relative;user-select:none">
+              <div id="hist-pill" style="position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);background:var(--blue);border-radius:999px;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:transform 0.2s ease"></div>
+              <div id="hist-tab-vendors" style="flex:1;padding:7px 12px;font-size:12px;font-weight:600;text-align:center;position:relative;color:#fff;transition:color 0.2s;white-space:nowrap">Vendor History</div>
+              <div id="hist-tab-markets" style="flex:1;padding:7px 12px;font-size:12px;font-weight:600;text-align:center;position:relative;color:var(--text2);transition:color 0.2s;white-space:nowrap">Market History</div>
+            </div>
+          </div>
+          <div id="hist-vendors-section">
+            <div class="card">
+              <div class="toolbar">
+                <input class="search-input" type="text" placeholder="Search vendors..." oninput="renderVendorHistory(this.value)">
+              </div>
+              <table class="vendor-table desktop-table"><thead><tr><th>Vendor</th><th>Markets attended</th><th>Last market</th></tr></thead><tbody id="hist-v-tbody"></tbody></table>
+              <div class="mobile-cards" id="hist-v-cards"></div>
+              <div id="hist-v-empty" class="empty-state" style="display:none">No archived vendor history yet. Archive a market to start building history.</div>
+            </div>
+          </div>
+          <div id="hist-markets-section" style="display:none">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
+              <button class="btn small danger" onclick="purgeHistory()">Purge All History</button>
+            </div>
+            <div id="hist-m-list"></div>
+            <div id="hist-m-empty" class="empty-state" style="display:none">No archived markets yet. Archive a market from the Markets page to preserve its data here.</div>
+          </div>
         </div>
         <div class="settings-sec" id="ssec-email">
           <h3 class="settings-sec-title">Email templates</h3>
@@ -384,9 +447,30 @@
           </div>
           <hr style="border:none;border-top:0.5px solid var(--border);margin-bottom:1.25rem">
           <button class="btn" style="font-size:13px" onclick="sendPasswordResetFromAccount()">Change password</button>
+          <hr style="border:none;border-top:0.5px solid var(--border);margin:1.5rem 0 1.25rem">
+          <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px">Danger zone</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:1rem">Permanently delete your account and all associated data. This cannot be undone.</div>
+          <button class="btn danger" style="font-size:13px" onclick="document.getElementById('delete-account-confirm-input').value='';document.getElementById('delete-account-confirm-btn').disabled=true;document.getElementById('delete-account-confirm-input').placeholder=currentUser.market;openModal('delete-account-modal')">Delete account</button>
         </div>
       </div>
     </div>
+  </div>
+
+
+  <div id="page-market-detail" class="page">
+    <div class="vd-topbar no-print">
+      <button class="back-btn" style="margin:0" onclick="showPage('settings');showSettingsSec('history')">&#8592; Back to History</button>
+      <button class="btn" onclick="window.print()">&#128438; Print / Download PDF</button>
+    </div>
+    <div id="md-content"></div>
+  </div>
+
+  <div id="page-vendor-detail" class="page">
+    <div class="vd-topbar no-print">
+      <button class="back-btn" style="margin:0" onclick="showPage('settings');showSettingsSec('history')">&#8592; Back to History</button>
+      <button class="btn" onclick="window.print()">&#128438; Print / Download PDF</button>
+    </div>
+    <div id="vd-content"></div>
   </div>
 
   </div>
@@ -409,6 +493,44 @@
 
 <!-- TOAST -->
 <div id="toast"></div>
+
+<!-- ORGANISER ONBOARDING -->
+<div id="org-onboarding" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:none;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--bg);border-radius:16px;padding:32px;max-width:460px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+    <div id="ob-org-step-1">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:0.5rem">Step 1 of 2</div>
+      <h2 style="margin:0 0 0.5rem">Welcome to PicaMarket!</h2>
+      <p style="font-size:14px;color:var(--text2);margin:0 0 1.5rem">Thanks for signing up. Tell us a bit about your market or organisation so vendors know who you are.</p>
+      <div class="form-group">
+        <label class="form-label">Describe your market or organisation</label>
+        <textarea class="form-input" id="ob-org-desc" rows="4" placeholder="e.g. A monthly artisan market celebrating local crafts, food, and community." style="resize:vertical;min-height:90px"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:0.5rem">
+        <button class="btn" style="flex:1" onclick="obOrgSkip()">Skip for now</button>
+        <button class="btn primary" style="flex:2" onclick="obOrgNext()">Next</button>
+      </div>
+    </div>
+    <div id="ob-org-step-2" style="display:none">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:0.5rem">Step 2 of 2</div>
+      <h2 style="margin:0 0 0.5rem">Who can find you?</h2>
+      <p style="font-size:14px;color:var(--text2);margin:0 0 1.5rem">Choose whether vendors can discover you in the Market Directory.</p>
+      <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:10px;padding:16px;margin-bottom:1rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div>
+            <div style="font-size:14px;font-weight:500;color:var(--text)">Show in Vendor Directory</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px">Vendors can find and browse your markets</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="ob-org-public" checked><span class="slider"></span></label>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:1.25rem">You can change this any time in Account Settings.</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" style="flex:1" onclick="obOrgBack()">Back</button>
+        <button class="btn primary" style="flex:2" onclick="obOrgFinish()">Finish setup</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- DOT MENU -->
 <div class="dot-menu-popup" id="dot-menu">
@@ -578,6 +700,20 @@
   <button class="lb-arrow lb-next" onclick="event.stopPropagation();lightboxNav(1)">&#8250;</button>
   <div id="lightbox-counter"></div>
 </div>
+
+<!-- DELETE ACCOUNT MODAL (organiser) -->
+<div class="modal-overlay" id="delete-account-modal"><div class="modal"><div class="modal-handle"></div>
+  <div class="modal-header"><h3>Delete account</h3><button class="modal-close" onclick="closeModal('delete-account-modal')">&#x2715;</button></div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:0.75rem">This will permanently delete your account, all your markets, vendor applications, and settings. <strong style="color:var(--red)">This cannot be undone.</strong></p>
+  <div class="form-group" style="margin-bottom:1rem">
+    <label class="form-label">Type your market name to confirm</label>
+    <input class="form-input" id="delete-account-confirm-input" type="text" placeholder="" oninput="checkDeleteConfirm()">
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn" style="flex:1" onclick="closeModal('delete-account-modal')">Cancel</button>
+    <button class="btn danger" style="flex:1" id="delete-account-confirm-btn" disabled onclick="confirmDeleteAccount()">Delete account</button>
+  </div>
+</div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.100.1/dist/umd/supabase.min.js" integrity="sha384-RJpiDscpUIa2tmNUABXIB4EgEoaAMRcl5+yJJxYC+kXKvCFctiqLTn9j1AwOc9n1" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.19.0/js/md5.min.js" integrity="sha384-JmVtRz6RWiXnA14QbIOJzPuU3MidULOpBP66deeLLyyoF4Tr/gZlbkHkL6vTthxH" crossorigin="anonymous"></script>

@@ -27,6 +27,18 @@ function isPayFastIp(ip: string): boolean {
   return PAYFAST_CIDRS.some(cidr => inCidr(ip, cidr))
 }
 
+// PHP urlencode() encodes some chars that JS encodeURIComponent() doesn't (!, ', (, ), *, ~)
+function phpUrlencode(str: string): string {
+  return encodeURIComponent(str)
+    .replace(/%20/g, '+')
+    .replace(/!/g, '%21')
+    .replace(/'/g, '%27')
+    .replace(/\(/g, '%28')
+    .replace(/\)/g, '%29')
+    .replace(/\*/g, '%2A')
+    .replace(/~/g, '%7E')
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
@@ -47,7 +59,7 @@ Deno.serve(async (req) => {
     for (const [k, v] of params.entries()) {
       data[k] = v
       if (k !== 'signature') {
-        parts.push(`${k}=${encodeURIComponent(v.trim()).replace(/%20/g, '+')}`)
+        parts.push(`${k}=${phpUrlencode(v.trim())}`)
       }
     }
 

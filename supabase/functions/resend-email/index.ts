@@ -1,34 +1,46 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+const ALLOWED_ORIGINS = ['https://picamarket.site', 'https://www.picamarket.site']
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('Origin') || ''
+  const allowed = ALLOWED_ORIGINS.includes(origin) || origin.endsWith('.vercel.app') || origin.startsWith('http://localhost')
+  return {
+    'Access-Control-Allow-Origin': allowed ? origin : ALLOWED_ORIGINS[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  }
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req)
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
   try {
-    const { to, subject, html, user_id } = await req.json()
-    if (!to || !subject || !html || !user_id) return new Response('Missing fields', { status: 400 })
-    if (!EMAIL_RE.test(to)) return new Response('Invalid recipient', { status: 400 })
+    // Authenticate via JWT
+    const authHeader = req.headers.get('Authorization') || ''
+    const token = authHeader.replace('Bearer ', '')
+    if (!token) return new Response('Unauthorized', { status: 401, headers: corsHeaders })
 
-    // Verify caller is a known coordinator using service role
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
-    const { data: profile, error: profileError } = await supabase
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    if (authError || !user) return new Response('Unauthorized', { status: 401, headers: corsHeaders })
+
+    // Verify caller is a known coordinator
+    const { data: profile } = await supabase
       .from('profiles')
       .select('id')
-      .eq('id', user_id)
+      .eq('id', user.id)
       .single()
-    if (!profile) {
-      console.error('Profile lookup failed for user_id:', user_id, 'error:', profileError)
-      return new Response('Unauthorized', { status: 401 })
-    }
+    if (!profile) return new Response('Unauthorized', { status: 401, headers: corsHeaders })
+
+    const { to, subject, html } = await req.json()
+    if (!to || !subject || !html) return new Response('Missing fields', { status: 400, headers: corsHeaders })
+    if (!EMAIL_RE.test(to)) return new Response('Invalid recipient', { status: 400, headers: corsHeaders })
 
     const apiKey = Deno.env.get('RESEND_API_KEY')
     const from = Deno.env.get('RESEND_FROM') || 'PicaMarket <noreply@picamarket.site>'

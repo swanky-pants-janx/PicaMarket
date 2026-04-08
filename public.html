@@ -67,6 +67,10 @@
           <input type="text" id="hp-field" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
           <div class="cf-turnstile" data-sitekey="0x4AAAAAACvSECCEAevdD5i-" data-theme="auto" style="margin-top:0.5rem"></div>
           <button class="btn primary" style="width:100%;margin-top:0.75rem;padding:12px" onclick="submitVendorForm()">Submit application</button>
+          <div id="v-account-nudge" style="margin-top:0.75rem;padding:12px 14px;border-radius:10px;background:var(--blue-bg,rgba(59,130,246,0.08));border:0.5px solid var(--blue);font-size:13px;color:var(--text2);line-height:1.5">
+            <strong style="color:var(--text);display:block;margin-bottom:2px">Save your vendor details</strong>
+            <a href="vendor.html" style="color:var(--blue)">Create a free PicaMarket account</a> to have your stall info pre-filled automatically on future applications.
+          </div>
           <div id="v-success" style="display:none;margin-top:1rem;padding:12px;border-radius:8px;background:var(--green-bg);color:var(--green);font-size:13px;text-align:center;border:0.5px solid var(--green)">
             Application submitted! You'll be notified by email if approved.
           </div>
@@ -112,6 +116,27 @@ async function init() {
   renderMarkets();
   renderVendorFormMarkets();
   renderVendorForm(profile.settings&&profile.settings.form_fields||null);
+  tryVendorAutofill();
+}
+
+function tryVendorAutofill() {
+  try {
+    var saved = localStorage.getItem('pm_vendor_autofill');
+    if (!saved) return;
+    var data = JSON.parse(saved);
+    var nudge = document.getElementById('v-account-nudge');
+    if (nudge) nudge.style.display = 'none';
+    var nameEl = document.getElementById('v-name');
+    var descEl = document.getElementById('v-desc');
+    var emailEl = document.getElementById('v-email');
+    if (nameEl && data.stall_name) nameEl.value = data.stall_name;
+    if (descEl && data.what_you_sell) descEl.value = data.what_you_sell;
+    if (emailEl && data.email) emailEl.value = data.email;
+    if (data.images && data.images.length) {
+      _vendorImages = data.images.slice(0, 4);
+      renderVendorThumbs();
+    }
+  } catch(e) { /* ignore corrupt cache */ }
 }
 
 var DEFAULT_FORM_FIELDS=[
@@ -256,25 +281,12 @@ async function submitVendorForm() {
     marketStallTypes[mid] = sel ? sel.value : 'normal';
   });
 
-  // Turnstile verification
+  // Grab Turnstile token to send server-side (null on dev/localhost is OK — server skips if no secret configured)
   var tsToken = window.turnstile ? window.turnstile.getResponse() : null;
-  if (!tsToken) { alert('Please complete the security check before submitting.'); return; }
+  if (!tsToken && window.location.hostname !== 'localhost' && !window.location.hostname.endsWith('.vercel.app')) { alert('Please complete the security check before submitting.'); return; }
 
   var btn = document.querySelector('#pub-apply .btn.primary');
   btn.textContent = 'Submitting...'; btn.disabled = true;
-
-  var verifyRes = await fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/verify-turnstile', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json','Authorization':'Bearer sb_publishable_f64M7MFa88zOMuZ083v-lw_Ypgcyhx-'},
-    body: JSON.stringify({token: tsToken})
-  });
-  var verifyData = await verifyRes.json();
-  if (!verifyData.success) {
-    btn.textContent = 'Submit application'; btn.disabled = false;
-    alert('Security check failed. Please refresh the page and try again.');
-    if (window.turnstile) window.turnstile.reset();
-    return;
-  }
 
   var blockedEmails=(coordinator.settings&&coordinator.settings.blocked_emails)||[];
   if(blockedEmails.includes(email.toLowerCase())){
@@ -283,35 +295,30 @@ async function submitVendorForm() {
     return;
   }
 
-  var vendorId = crypto.randomUUID();
-  var {error} = await _sb.from('vendors').insert({
-    id: vendorId,
-    user_id: coordinator.id,
+  // Submit via Edge Function so the service-role key can check for duplicates (anon key can't SELECT vendors)
+  var submitPayload = {
+    coordinator_id: coordinator.id,
     name: name,
-    description: desc,
+    desc: desc,
     email: email,
     markets: selectedMarkets,
-    market_payments: {},
-    market_methods: {},
     market_stall_types: marketStallTypes,
-    status: 'pending',
-    pay_status: 'outstanding',
-    pay_method: null,
     images: _vendorImages.slice(),
-    submitted_at: new Date().toISOString().slice(0,10),
-    ...(customFields.length&&Object.keys(customResponses).length?{custom_responses:customResponses}:{})
+    turnstile_token: tsToken || undefined,
+  };
+  if (customFields.length && Object.keys(customResponses).length) submitPayload.custom_responses = customResponses;
+
+  var submitRes = await fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/submit-vendor', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','Authorization':'Bearer sb_publishable_f64M7MFa88zOMuZ083v-lw_Ypgcyhx-'},
+    body: JSON.stringify(submitPayload)
   });
+  var submitData = await submitRes.json();
 
   btn.textContent = 'Submit application'; btn.disabled = false;
-  if (!error) {
-    fetch('https://bjzckhanxudkyrpczqbs.supabase.co/functions/v1/notify-vendor-submission', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','Authorization':'Bearer sb_publishable_f64M7MFa88zOMuZ083v-lw_Ypgcyhx-'},
-      body: JSON.stringify({vendor_id: vendorId})
-    }).catch(function(err){ console.error('Notify error:', err); });
-  }
-
-  if (error) { alert('Something went wrong. Please try again.'); console.error(error); return; }
+  if (submitRes.status === 429) { alert(submitData.message || 'You have submitted recently. Please wait a few minutes before trying again.'); return; }
+  if (submitRes.status === 403 && submitData.error === 'blocked') { alert(submitData.message || 'This email address is not able to submit applications.'); return; }
+  if (!submitRes.ok) { alert('Something went wrong. Please try again.'); console.error(submitData); return; }
 
   _vendorImages=[];
   renderVendorForm(coordinator.settings&&coordinator.settings.form_fields||null);
