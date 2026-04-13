@@ -1,0 +1,1 @@
+ALTER TABLE markets ADD COLUMN IF NOT EXISTS todo_board JSONB;

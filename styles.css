@@ -388,3 +388,21 @@ select.form-input{font-size:14px}
 @media(max-width:767px){.home-cards{grid-template-columns:1fr 1fr}.home-hero{padding:1.25rem 1.25rem}}
 @media(max-width:440px){.home-cards{grid-template-columns:1fr}}
 @media(min-width:1024px){.metric-grid{grid-template-columns:repeat(4,1fr)}}
+/* ── TODO BOARD ─────────────────────────────────────────────────── */
+.todo-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;align-items:flex-start;-webkit-overflow-scrolling:touch}
+.todo-col{background:var(--bg2);border:0.5px solid var(--border);border-radius:10px;padding:12px;min-width:220px;max-width:260px;flex-shrink:0;display:flex;flex-direction:column}
+.todo-col-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
+.todo-col-title{font-size:13px;font-weight:600;color:var(--text);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.todo-col-title:hover{color:var(--blue)}
+.todo-col-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:17px;padding:0 2px;line-height:1;flex-shrink:0;font-family:inherit}
+.todo-col-del:hover{color:var(--red)}
+.todo-cards{display:flex;flex-direction:column;gap:6px;min-height:32px;margin-bottom:8px}
+.todo-card{display:flex;align-items:flex-start;gap:6px;background:var(--bg);border:0.5px solid var(--border);border-radius:8px;padding:8px 10px;cursor:grab;transition:box-shadow 0.15s,opacity 0.15s}
+.todo-card:hover{border-color:var(--border2);box-shadow:0 2px 8px rgba(0,0,0,0.07)}
+.todo-card.dragging{opacity:0.35;cursor:grabbing}
+.todo-card-text{font-size:13px;color:var(--text);line-height:1.4;word-break:break-word;flex:1}
+.todo-card-text.done{text-decoration:line-through;color:var(--text3)}
+.todo-card-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:0;flex-shrink:0;line-height:1;margin-top:1px;font-family:inherit}
+.todo-card-del:hover{color:var(--red)}
+.todo-add-row{display:flex;gap:6px;align-items:center}
+.todo-add-input{font-size:12px;padding:6px 8px;flex:1;min-width:0}
