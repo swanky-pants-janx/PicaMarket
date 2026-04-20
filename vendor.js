@@ -16,10 +16,10 @@ function openModal(id){var el=document.getElementById(id);if(el)el.classList.add
 // ── SESSION ───────────────────────────────────────────────────────
 _sb.auth.onAuthStateChange(async(event, session) => {
   if (event === 'INITIAL_SESSION') {
-    if (!session) { window.location.href = 'index.html'; return; }
+    if (!session) { window.location.href = 'app.html'; return; }
     // Verify this is a vendor account
     var { data: vp } = await _sb.from('vendor_profiles').select('*').eq('user_id', session.user.id).maybeSingle();
-    if (!vp) { window.location.href = 'index.html'; return; }
+    if (!vp) { window.location.href = 'app.html'; return; }
     _vendorUser = session.user;
     _vendorProfile = vp;
     // Ensure email is set so organiser verified-badge matching works
@@ -70,7 +70,7 @@ function vdShowPage(p) {
 // ── LOGOUT ────────────────────────────────────────────────────────
 async function vdLogout() {
   await _sb.auth.signOut();
-  window.location.href = 'index.html';
+  window.location.href = 'app.html';
 }
 
 // ── PROFILE ───────────────────────────────────────────────────────
@@ -304,7 +304,7 @@ async function vdConfirmDeleteAccount() {
   });
   if (!res.ok) { showToast('Delete failed. Please try again.'); btn.textContent = 'Delete account'; btn.disabled = false; return; }
   await _sb.auth.signOut();
-  window.location.href = 'index.html';
+  window.location.href = 'app.html';
 }
 
 async function vdSendPasswordReset() {
