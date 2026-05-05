@@ -886,3 +886,81 @@ function submitVendorForm(){
 }
 
 function exportCSV(type){var list=type==='pending'?state.vendors.filter(v=>v.status==='pending'):state.vendors.filter(v=>v.status==='approved');if(!list.length){alert('No vendors to export.');return;}var headers=type==='pending'?['Name','Email','Description','Markets','Submitted']:['Name','Email','Markets','Stall Types','Stall Fee (R)','Payment Status','Payment Method','Approved'];var rows=list.map(v=>{var mnames=v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);return m?m.name:'?';}).join('; ');var fee=v.markets.reduce((t,mid)=>{var m=state.markets.find(x=>x.id===mid);return t+getStallFee(v,m);},0);var stallTypes=v.markets.map(mid=>{var m=state.markets.find(x=>x.id===mid);return(m?m.name:'?')+': '+stallTypeLabel(v,m);}).join('; ');return type==='pending'?[v.name,v.email,v.desc,mnames,v.submitted]:[v.name,v.email,mnames,stallTypes,fee,v.payStatus||'outstanding',v.payMethod||'',v.approvedAt||''];});var csv=[headers,...rows].map(r=>r.map(c=>'"'+(c||'').toString().replace(/"/g,'""')+'"').join(',')).join('\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=type+'-vendors.csv';a.click();}
+
+// ── PLAYWRIGHT MOCK ───────────────────────────────────────────────
+// This block is only present on the playwright-test branch.
+// It bypasses Supabase entirely and boots straight into the dashboard
+// with deterministic fake data so Playwright tests have no network deps.
+(function(){
+  var MOCK_ID='mock-organiser-playwright';
+  var MOCK_MARKET='Pica Test Market';
+  var MOCK_NAME='Test Organiser';
+  var MOCK_SLUG='pica-test-market';
+
+  // ── helpers (local to this scope) ────────────────────────────────
+  function _fd(days){var d=new Date();d.setDate(d.getDate()+days);return d.toISOString().slice(0,10);}
+  function _pd(days){var d=new Date();d.setDate(d.getDate()-days);return d.toISOString().slice(0,10);}
+
+  // ── mock data ────────────────────────────────────────────────────
+  function buildMockData(){
+    var m1id=uid(),m2id=uid(),m3id=uid();
+    var markets=[
+      {id:m1id,name:'Spring Craft Fair',desc:'Our flagship spring market with artisan goods.',header:'',fee:350,stallTypes:[{id:'normal-stall',name:'Normal stall',fee:350,color:'#6b7280'},{id:'premium',name:'Premium corner',fee:550,color:'#ca8a04'}],capacity:40,dates:[_fd(14),_fd(21)],deadline:_fd(7),startTime:'08:00',endTime:'14:00',banner:null,published:true,notes:'',todoBoard:null},
+      {id:m2id,name:'Sunday Food Market',desc:'Street food and local produce every Sunday.',header:'',fee:450,stallTypes:[{id:'food',name:'Food vendor',fee:450,color:'#ea580c'},{id:'craft',name:'Craft stall',fee:300,color:'#7c3aed'}],capacity:25,dates:[_fd(7),_fd(28)],deadline:_fd(3),startTime:'09:00',endTime:'15:00',banner:null,published:true,notes:'',todoBoard:null},
+      {id:m3id,name:'Winter Heritage Fair',desc:'Past market — archived for reference.',header:'',fee:300,stallTypes:[{id:'normal-stall',name:'Normal stall',fee:300,color:'#6b7280'}],capacity:30,dates:[_pd(30)],deadline:null,startTime:'08:00',endTime:'13:00',banner:null,published:false,notes:'',todoBoard:null}
+    ];
+    var vendors=[
+      // pending
+      {id:uid(),name:'Handmade Jewellery by Amara',desc:'Sterling silver and semi-precious stone jewellery.',email:'amara.smith@example.com',status:'pending',markets:[m1id],marketPayments:{},marketMethods:{},marketStallTypes:{[m1id]:'normal-stall'},marketAttendance:{},payStatus:'outstanding',payMethod:null,images:[],submitted:_pd(3),approvedAt:'',customResponses:{}},
+      {id:uid(),name:'Artisan Bread by Sarah',desc:'Sourdough and rye loaves baked fresh.',email:'sarah.jones@example.com',status:'pending',markets:[m2id],marketPayments:{},marketMethods:{},marketStallTypes:{[m2id]:'food'},marketAttendance:{},payStatus:'outstanding',payMethod:null,images:[],submitted:_pd(2),approvedAt:'',customResponses:{}},
+      {id:uid(),name:'Organic Honey by Thabo',desc:'Raw unfiltered honey from free-range hives.',email:'thabo.nkosi@example.com',status:'pending',markets:[m1id,m2id],marketPayments:{},marketMethods:{},marketStallTypes:{[m1id]:'normal-stall',[m2id]:'craft'},marketAttendance:{},payStatus:'outstanding',payMethod:null,images:[],submitted:_pd(1),approvedAt:'',customResponses:{}},
+      {id:uid(),name:'Pressed Juices by Fatima',desc:'Cold-pressed seasonal juices with no additives.',email:'fatima.khan@example.com',status:'pending',markets:[m2id],marketPayments:{},marketMethods:{},marketStallTypes:{[m2id]:'food'},marketAttendance:{},payStatus:'outstanding',payMethod:null,images:[],submitted:_pd(5),approvedAt:'',customResponses:{}},
+      {id:uid(),name:'Wire Art by Sipho',desc:'Handcrafted wire sculptures and wall art.',email:'sipho.dlamini@example.com',status:'pending',markets:[m1id],marketPayments:{},marketMethods:{},marketStallTypes:{[m1id]:'premium'},marketAttendance:{},payStatus:'outstanding',payMethod:null,images:[],submitted:_pd(4),approvedAt:'',customResponses:{}},
+      // approved + paid
+      {id:uid(),name:'Natural Skincare by Nomsa',desc:'Plant-based skincare free from harsh chemicals.',email:'nomsa.khumalo@example.com',status:'approved',markets:[m1id],marketPayments:{[m1id]:'paid'},marketMethods:{[m1id]:'eft'},marketStallTypes:{[m1id]:'normal-stall'},marketAttendance:{},payStatus:'paid',payMethod:'eft',images:[],submitted:_pd(14),approvedAt:_pd(10),customResponses:{}},
+      {id:uid(),name:'Artisan Ceramics by Priya',desc:'Wheel-thrown functional pottery with local clay.',email:'priya.naidoo@example.com',status:'approved',markets:[m1id,m2id],marketPayments:{[m1id]:'paid',[m2id]:'paid'},marketMethods:{[m1id]:'payfast',[m2id]:'payfast'},marketStallTypes:{[m1id]:'premium',[m2id]:'craft'},marketAttendance:{},payStatus:'paid',payMethod:'payfast',images:[],submitted:_pd(20),approvedAt:_pd(15),customResponses:{}},
+      {id:uid(),name:'Specialty Coffee by James',desc:'Single-origin filter coffee and espresso.',email:'james.brown@example.com',status:'approved',markets:[m2id],marketPayments:{[m2id]:'paid'},marketMethods:{[m2id]:'cash'},marketStallTypes:{[m2id]:'food'},marketAttendance:{},payStatus:'paid',payMethod:'cash',images:[],submitted:_pd(18),approvedAt:_pd(12),customResponses:{}},
+      // approved + outstanding
+      {id:uid(),name:'Vintage Clothing by Lisa',desc:'Curated vintage and second-hand fashion.',email:'lisa.williams@example.com',status:'approved',markets:[m1id],marketPayments:{[m1id]:'outstanding'},marketMethods:{},marketStallTypes:{[m1id]:'normal-stall'},marketAttendance:{},payStatus:'outstanding',payMethod:null,images:[],submitted:_pd(12),approvedAt:_pd(8),customResponses:{}},
+      {id:uid(),name:'Dried Herbs by Maria',desc:'Medicinal and culinary dried herbs and tinctures.',email:'maria.petersen@example.com',status:'approved',markets:[m2id],marketPayments:{[m2id]:'outstanding'},marketMethods:{},marketStallTypes:{[m2id]:'craft'},marketAttendance:{},payStatus:'outstanding',payMethod:null,images:[],submitted:_pd(9),approvedAt:_pd(6),customResponses:{}}
+    ];
+    return{markets:markets,vendors:vendors};
+  }
+
+  // ── no-op overrides for all Supabase-touching functions ──────────
+  loadUserData=async function(){
+    var d=buildMockData();
+    state.markets=d.markets;
+    state.vendors=d.vendors;
+    state.archivedMarkets=[];
+    state.verifiedEmails=new Set(['priya.naidoo@example.com','james.brown@example.com']);
+  };
+  startVendorWatch=function(){};
+  saveUserSettings=function(){};
+  sbSave=async function(){return true;};
+  sbDel=async function(){return true;};
+  sendEmail=async function(){};
+
+  // ── boot on DOMContentLoaded ─────────────────────────────────────
+  window.addEventListener('DOMContentLoaded',function(){
+    currentUser={
+      id:MOCK_ID,email:'test@picamarket.site',
+      market:MOCK_MARKET,name:MOCK_NAME,slug:MOCK_SLUG,
+      isPublic:true,description:'A test market for Playwright testing.',
+      payfastMerchantId:null,payfastMerchantKey:null,payfastPassphrase:null,payfastSandbox:false,
+      bankHolder:null,bankName:null,bankAccNum:null,bankBranch:null,bankAccType:null,
+      emailApprovalIntro:null,emailReminderIntro:null,
+      blockedEmails:[],formFields:DEFAULT_FORM_FIELDS,notifyOnApply:true
+    };
+    state.vendors=[];state.markets=[];state.expandedRows={};state.filterPayment='';
+    document.getElementById('auth-screen').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    document.getElementById('nav-brand').innerHTML='<span>'+esc(MOCK_MARKET)+'</span><span class="nav-brand-suffix"> &ndash; Dashboard</span>';
+    document.getElementById('nav-user').textContent=MOCK_NAME;
+    document.getElementById('sidebar-user').textContent=MOCK_NAME;
+    document.getElementById('pub-title').textContent=MOCK_MARKET;
+    // suppress onboarding modal
+    localStorage.setItem('pm_ob_done_'+MOCK_ID,'1');
+    loadUserData().then(function(){showPage('home');});
+  });
+})();
