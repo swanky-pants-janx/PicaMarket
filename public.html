@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://bjzckhanxudkyrpczqbs.supabase.co wss://bjzckhanxudkyrpczqbs.supabase.co https://challenges.cloudflare.com; img-src 'self' https://bjzckhanxudkyrpczqbs.supabase.co data: blob:; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://bjzckhanxudkyrpczqbs.supabase.co wss://bjzckhanxudkyrpczqbs.supabase.co; img-src 'self' https://bjzckhanxudkyrpczqbs.supabase.co data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>PicaMarket</title>
 <link rel="stylesheet" href="styles.css">
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
   #loading{display:flex;align-items:center;justify-content:center;min-height:60vh;font-size:14px;color:var(--text2)}
   #error{display:none;text-align:center;padding:3rem 1rem}
@@ -65,7 +64,6 @@
           </div>
           <!-- honeypot: never visible to real users, bots fill it -->
           <input type="text" id="hp-field" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
-          <div class="cf-turnstile" data-sitekey="0x4AAAAAACvSECCEAevdD5i-" data-theme="auto" style="margin-top:0.5rem"></div>
           <button class="btn primary" style="width:100%;margin-top:0.75rem;padding:12px" onclick="submitVendorForm()">Submit application</button>
           <div id="v-account-nudge" style="margin-top:0.75rem;padding:12px 14px;border-radius:10px;background:var(--blue-bg,rgba(59,130,246,0.08));border:0.5px solid var(--blue);font-size:13px;color:var(--text2);line-height:1.5">
             <strong style="color:var(--text);display:block;margin-bottom:2px">Save your vendor details</strong>
@@ -281,10 +279,6 @@ async function submitVendorForm() {
     marketStallTypes[mid] = sel ? sel.value : 'normal';
   });
 
-  // Grab Turnstile token to send server-side (null on dev/localhost is OK — server skips if no secret configured)
-  var tsToken = window.turnstile ? window.turnstile.getResponse() : null;
-  if (!tsToken && window.location.hostname !== 'localhost' && !window.location.hostname.endsWith('.vercel.app')) { alert('Please complete the security check before submitting.'); return; }
-
   var btn = document.querySelector('#pub-apply .btn.primary');
   btn.textContent = 'Submitting...'; btn.disabled = true;
 
@@ -304,7 +298,6 @@ async function submitVendorForm() {
     markets: selectedMarkets,
     market_stall_types: marketStallTypes,
     images: _vendorImages.slice(),
-    turnstile_token: tsToken || undefined,
   };
   if (customFields.length && Object.keys(customResponses).length) submitPayload.custom_responses = customResponses;
 
@@ -323,7 +316,6 @@ async function submitVendorForm() {
   _vendorImages=[];
   renderVendorForm(coordinator.settings&&coordinator.settings.form_fields||null);
   document.querySelectorAll('.v-mkt-check').forEach(function(c){c.checked=false;c.closest('.market-select-card').classList.remove('selected');});
-  if (window.turnstile) window.turnstile.reset();
   var s = document.getElementById('v-success');
   s.style.display='block'; setTimeout(function(){s.style.display='none';},5000);
 }
